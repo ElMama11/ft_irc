@@ -1,7 +1,7 @@
 #include "Socket.hpp"
 
 MySocket::MySocket(const char *ip, int port, int address_family, int type) {
-		std::cout << "Socket constructor." << std::endl;
+		std::cout << "MySocket constructor." << std::endl;
 		memset(this->buffer, 0, 4096);
 		this->socfd = 0;
 		this->ip = ip;
@@ -11,7 +11,7 @@ MySocket::MySocket(const char *ip, int port, int address_family, int type) {
 	};
 
 MySocket::~MySocket() {
-	std::cout << "Je suis Bob le démolisseur." << std::endl;
+	std::cout << "MySocket destructor." << std::endl;
 }
 
 /* MEMBER FUNCTIONS*/
@@ -52,7 +52,8 @@ int MySocket::await_for_connection() {
 int MySocket::soc_bind() {
 	this->hint.sin_family = this->address_family;
 	this->hint.sin_port = htons(this->port);
-	inet_pton(this->address_family, this->ip, &(this->hint.sin_addr));
+	//inet_pton(this->address_family, this->ip, &(this->hint.sin_addr));
+	//this->hint.sin_addr = inet_addr(this->ip);				// inutile ?
 	if (bind(this->socfd, (sockaddr*)&(this->hint), sizeof(this->hint)) == -1) {
 		std::cerr << "Can't bind to IP/port." << std::endl;
 		return -2;
