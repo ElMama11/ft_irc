@@ -3,12 +3,19 @@
 int main() {
 
 	MySocket *soc = new MySocket("0.0.0.0", 54003, AF_INET, SOCK_STREAM);
-	
+
+	fd_set readfds;
+	int opt = 1;
+
 	soc->init();
+	if (setsockopt(soc->socfd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(int)) < 0) {
+		std::cerr << "Error on setsockopt" << std::endl;
+		return -1;
+	}
 	soc->soc_bind();
 	soc->mark();
 
-	int user_soc_fd = soc->await_for_connection();
+	int user_soc_fd = soc->await_for_connection(); //a mettre dans le while
 	
 	close(soc->socfd);
 	
@@ -17,7 +24,6 @@ int main() {
 	soc->handle();
 
 	close(soc->socfd);
-
 	delete soc;
 
 
