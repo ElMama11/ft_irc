@@ -1,5 +1,5 @@
 GCC = c++
-FLAGS = -std=c++98 -g -Wall -Wextra -Werror 
+FLAGS = -std=c++98 -g #-Wall -Wextra -Werror 
 
 NAME = ft_irc
 

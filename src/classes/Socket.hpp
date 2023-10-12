@@ -6,6 +6,13 @@
 #include <string>
 #include <arpa/inet.h>
 #include <cstring>
+#include <sys/time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+
+
+#define MAX_CLIENTS 30
 
 // class SocketsManager {
 // 	public:
@@ -38,14 +45,5 @@ class MySocket {
 		void set_socfd(int socfd);
 
 	private:
-		void _log_connection() {
-			int result = getnameinfo((sockaddr*)&(this->client), sizeof(this->client), this->host, NI_MAXHOST, this->service, NI_MAXSERV, 0);
-			if (result) {
-				std::cout << this->host << " connected on " << this->service << std::endl;
-			}
-			else {
-				inet_ntop(AF_INET, &(this->client.sin_addr), this->host, NI_MAXHOST);
-				std::cout << this->host << " connected on " << ntohs(this->client.sin_port) << std::endl;
-			}
-	}
+		void _log_connection();
 };
