@@ -69,108 +69,75 @@ void MySocket::handle() {
 	int client_socket[30];
 	int i = 0, sd = 0, activity = 0, new_socket = 0, hintlen = sizeof(this->hint), valread = 0;
 	//initialise all client_socket[] to 0 so not checked  
-    for (i = 0; i < MAX_CLIENTS; i++) {
-        client_socket[i] = 0;
+	for (i = 0; i < MAX_CLIENTS; i++) {
+		client_socket[i] = 0;
 	}
-
 	while (true) {
 		//Clear buffer & socket set
 		memset(this->buffer, 0, 4096);
 		FD_ZERO(&readfds);
 		//add master socket to set
-        FD_SET(this->socfd, &readfds);
+		FD_SET(this->socfd, &readfds);
 		max_sd = this->socfd;
 		//add child sockets to set
-		for ( i = 0 ; i < MAX_CLIENTS ; i++)
+		for (i = 0; i < MAX_CLIENTS; i++)
 		{   
 			//socket descriptor
 			sd = client_socket[i];
-					
 			//if valid socket descriptor then add to read list
 			if(sd > 0)
 				FD_SET( sd , &readfds);
-					
-            //highest file descriptor number, need it for the select function  
-            if(sd > max_sd)   
-                max_sd = sd;   
-        }
-		//wait for an activity on one of the sockets , timeout is NULL ,  
-        //so wait indefinitely  
-        activity = select( max_sd + 1 , &readfds , NULL , NULL , NULL);   
-        if ((activity < 0) && (errno!=EINTR))   
-        {   
-            printf("select error");   
-        }
-		//If something happened on the master socket ,  
-        //then its an incoming connection  
-        if (FD_ISSET(this->socfd, &readfds))   
-        {   
-            if ((new_socket = accept(this->socfd,  
-                    (struct sockaddr *)&hint, (socklen_t*)&hintlen)) < 0)   
-            {   
-                perror("accept");   
-                exit(EXIT_FAILURE);   
-            }   
-             
-            //inform user of socket number - used in send and receive commands  
-            printf("New connection , socket fd is %d , ip is : %s , port : %d \n" , new_socket , inet_ntoa(this->hint.sin_addr) , ntohs 
-                  (this->hint.sin_port));
-			//add new socket to array of sockets  
-            for (i = 0; i < MAX_CLIENTS; i++)   
-            {   
-                //if position is empty  
-                if( client_socket[i] == 0 )   
-                {   
-                    client_socket[i] = new_socket;   
-                    printf("Adding to list of sockets as %d\n" , i);   
-                    break;   
-                }   
-            }
+			//highest file descriptor number, need it for the select function
+			if(sd > max_sd)
+				max_sd = sd;
+		}
+		//wait for an activity on one of the sockets, timeout is NULL, so wait indefinitely  
+		activity = select( max_sd + 1 , &readfds , NULL , NULL , NULL);
+		if ((activity < 0) && (errno != EINTR))
+			printf("select error");
+		//If something happened on the master socket, then its an incoming connection
+		if (FD_ISSET(this->socfd, &readfds)) {
+			if ((new_socket = accept(this->socfd, (struct sockaddr *)&hint, (socklen_t*)&hintlen)) < 0) {
+				perror("accept");
+				exit(EXIT_FAILURE);
+			}
+			//inform user of socket number - used in send and receive commands
+			printf("New connection , socket fd is %d , ip is : %s , port : %d \n" , new_socket , inet_ntoa(this->hint.sin_addr) , ntohs(this->hint.sin_port));
+			//add new socket to array of sockets
+			for (i = 0; i < MAX_CLIENTS; i++) {
+				//if position is empty
+				if(client_socket[i] == 0) {
+					client_socket[i] = new_socket;   
+					printf("Adding to list of sockets as %d\n", i);
+					break;
+				}
+			}
 		}
 		//else its some IO operation on some other socket 
-        for (i = 0; i < MAX_CLIENTS; i++)   
-        {   
-            sd = client_socket[i];   
-                 
-            if (FD_ISSET( sd , &readfds))   
-            {   
-                //Check if it was for closing , and also read the incoming message  
-                if ((valread = read( sd , buffer, 1024)) == 0)   
-                {   
-                    //Somebody disconnected , get his details and print  
-                    getpeername(sd , (struct sockaddr*)&this->hint, (socklen_t*)&hintlen);   
-                    printf("Host disconnected , ip %s , port %d \n", inet_ntoa(this->hint.sin_addr), ntohs(this->hint.sin_port));   
-                    //Close the socket and mark as 0 in list for reuse  
-                    close( sd );   
-                    client_socket[i] = 0;   
-                }   
-                //Echo back the message that came in  
-                else 
-                {
-                    //set the string terminating NULL byte on the end of the data read  
-                    buffer[valread] = '\0';   
-                    send(sd , buffer , strlen(buffer) , 0 );   
-                }   
-            }   
-        }
+		for (i = 0; i < MAX_CLIENTS; i++) {
+			sd = client_socket[i];
+			if (FD_ISSET(sd , &readfds)) {
+				//Check if it was for closing , and also read the incoming message  
+				if ((valread = read( sd , buffer, 1024)) == 0) {
+					//Somebody disconnected , get his details and print
+					getpeername(sd , (struct sockaddr*)&this->hint, (socklen_t*)&hintlen);
+					printf("Host disconnected , ip %s , port %d \n", inet_ntoa(this->hint.sin_addr), ntohs(this->hint.sin_port));   
+					//Close the socket and mark as 0 in list for reuse  
+					close(sd);
+					client_socket[i] = 0;
+				}   
+				//Echo back the message that came in  
+				else {
+					//set the string terminating NULL byte on the end of the data read  
+					buffer[valread] = '\0';   
+					send(sd, buffer, strlen(buffer), 0);
+					std::cout << buffer << std::endl;
+				}
+			}
+		}
 	}
 }
 
-            // //Wait a message
-			// int bytesRecv = recv(this->socfd, this->buffer, 4096, 0);
-			// if (bytesRecv == -1) {
-			// 	std::cerr << "connection issue" << std::endl;
-			// 	break;
-			// }
-			// if (bytesRecv == 0) {
-			// 	std::cout << "client disconnected" << std::endl;
-			// 	break;
-			// }
-			// //Display message
-			// std::cout << "Received: " << "socfd=" << this->socfd << " : " << 0 << bytesRecv << std::endl;
-			// std::cout << "Received: " << std::string(buffer) << std::endl;
-			// //Resend message
-			// send(this->socfd, this->buffer, bytesRecv + 1, 0);   
 void MySocket::set_socfd(int socfd) {
 	this->socfd = socfd;
 }
