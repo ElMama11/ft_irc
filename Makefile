@@ -1,7 +1,7 @@
 GCC = c++
 FLAGS = -std=c++98 -g #-Wall -Wextra -Werror 
 
-NAME = ft_irc
+NAME = ircserv
 
 GREEN       = \033[32m
 RED         = \033[31m

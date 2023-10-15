@@ -21,6 +21,11 @@
 // };
 
 class MySocket {
+
+	private:
+		void _log_connection();
+		int _handle_multiples_connection();
+
 	public:
 	
 		int socfd;
@@ -37,13 +42,39 @@ class MySocket {
 		MySocket(const char *ip, int port, int address_family, int type);
 		~MySocket();
 
-		int init();
-		int mark();
+		void init();
+		void mark();
 		int await_for_connection();
-		int soc_bind();
+		void soc_bind();
 		void handle();
 		void set_socfd(int socfd);
+		
+		/* ERROR CLASSES*/
 
-	private:
-		void _log_connection();
+		class bindSocketError : public std::exception
+		{
+			public:
+				virtual const char* what() const throw()
+				{
+					return ("Error: Can't bind socket to IP/port.");
+				}
+		};
+
+		class createSocketError : public std::exception
+		{
+			public:
+				virtual const char* what() const throw()
+				{
+					return ("Error: Can't create a socket");
+				}
+		};
+
+		class markSocketError : public std::exception
+		{
+			public:
+				virtual const char* what() const throw()
+				{
+					return ("Error: Can't set the socket on listening");
+				}
+		};
 };

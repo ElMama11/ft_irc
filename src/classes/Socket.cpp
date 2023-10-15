@@ -16,37 +16,29 @@ MySocket::~MySocket() {
 
 /* MEMBER FUNCTIONS*/
 
-int MySocket::init() {
+void MySocket::init() {
 	this->socfd = socket(this->address_family, this->type, 0);
-	if (this->socfd == -1) {
-		std::cerr << "can't create a socket" << std::endl;
-		return -1;
-	}
+	if (this->socfd == -1)
+		throw createSocketError();
 	std::cout << "INIT OK" << std::endl;
-	return 0;
+	_handle_multiples_connection();
 }
 
-int MySocket::soc_bind() {
+void MySocket::soc_bind() {
 	this->hint.sin_family = this->address_family;
 	this->hint.sin_port = htons(this->port);
 	this->hint.sin_addr.s_addr = INADDR_ANY;
 	//inet_pton(this->address_family, this->ip, &(this->hint.sin_addr));
 	//this->hint.sin_addr = inet_addr(this->ip);				// inutile ?
-	if (bind(this->socfd, (sockaddr*)&(this->hint), sizeof(this->hint)) == -1) {
-		std::cerr << "Can't bind to IP/port." << std::endl;
-		return -2;
-	}
+	if (bind(this->socfd, (sockaddr*)&(this->hint), sizeof(this->hint)) == -1)
+		throw bindSocketError();
 	std::cout << "Bind ok, listener on port " << this->port << std::endl;
-	return 0;
 }
 
-int MySocket::mark() {
-	if (listen(this->socfd, SOMAXCONN) < 0) {
-		std::cerr << "Can't listen." << std::endl;
-		return -3;
-	}
+void MySocket::mark() {
+	if (listen(this->socfd, SOMAXCONN) < 0)
+		throw markSocketError();
 	std::cout << "MARK OK" << std::endl;
-	return 0;
 }
 
 int MySocket::await_for_connection() {
@@ -152,4 +144,13 @@ void MySocket::_log_connection() {
 		inet_ntop(AF_INET, &(this->client.sin_addr), this->host, NI_MAXHOST);
 		std::cout << this->host << " connected on " << ntohs(this->client.sin_port) << std::endl;
 	}
+}
+
+int MySocket::_handle_multiples_connection() {
+	int opt = 1;
+	if (setsockopt(this->socfd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0) {
+		std::cerr << "Error on setsockopt" << std::endl;
+		return -1;
+	}
+	return 0;
 }

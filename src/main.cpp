@@ -1,23 +1,22 @@
 #include "classes/Socket.hpp"
 
-int main() {
+int main(int ac, char **av) {
 
-	MySocket *master_socket = new MySocket("0.0.0.0", 54003, AF_INET, SOCK_STREAM);
-	int opt = 1, i = 0;
-
-	master_socket->init();
-	if (setsockopt(master_socket->socfd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0) {
-		std::cerr << "Error on setsockopt" << std::endl;
-		return -1;
+	if (ac != 3) {
+		std::cerr << "USAGE : ./ircserv <port> <password>" << std::endl;
+		exit(EXIT_FAILURE);
 	}
-	master_socket->soc_bind();
-	master_socket->mark();
+	MySocket *master_socket = new MySocket("0.0.0.0", atoi(av[1]), AF_INET, SOCK_STREAM);
 
-	//int user_soc_fd = master_socket->await_for_connection(); //a mettre dans le while
-	
-	//close(master_socket->socfd);
-	//master_socket->set_socfd(user_soc_fd);
-	master_socket->handle();
+	try {
+		master_socket->init();
+		master_socket->soc_bind();
+		master_socket->mark();
+		master_socket->handle();
+	}
+	catch (const std::exception& e) {
+		std::cerr << e.what() << std::endl;
+	}
 
 	close(master_socket->socfd);
 	delete master_socket;
