@@ -1,18 +1,21 @@
-#include <iostream>
-#include <sys/types.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <string>
-#include <arpa/inet.h>
-#include <cstring>
-#include <sys/time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
+#ifndef SOCKET_HPP
+# define SOCKET_HPP
+
+# include <iostream>
+# include <sys/types.h>
+# include <unistd.h>
+# include <sys/socket.h>
+# include <netdb.h>
+# include <string>
+# include <arpa/inet.h>
+# include <cstring>
+# include <sys/time.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <errno.h>
 
 
-#define MAX_CLIENTS 30
+# define MAX_CLIENTS 30
 
 // class SocketsManager {
 // 	public:
@@ -28,6 +31,16 @@ class MySocket {
 
 	public:
 	
+		MySocket(const char *ip, int port, int address_family, int type);
+		~MySocket();
+
+		void init();
+		void mark();
+		int await_for_connection();
+		void soc_bind();
+		void handle();
+		void set_socfd(int socfd);
+
 		int socfd;
 		int port;
 		int address_family;
@@ -39,15 +52,6 @@ class MySocket {
 		sockaddr_in hint;
 		sockaddr_in client;
 
-		MySocket(const char *ip, int port, int address_family, int type);
-		~MySocket();
-
-		void init();
-		void mark();
-		int await_for_connection();
-		void soc_bind();
-		void handle();
-		void set_socfd(int socfd);
 		
 		/* ERROR CLASSES*/
 
@@ -78,3 +82,5 @@ class MySocket {
 				}
 		};
 };
+
+#endif
