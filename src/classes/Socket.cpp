@@ -92,7 +92,7 @@ void MySocket::handle() {
 			sd = this->_client_socket[i];
 			if (FD_ISSET(sd , &this->_readfds)) {
 				//Check if it was for closing , and also read the incoming message  
-				if ((valread = read(sd , buffer, 1024)) == 0)
+				if ((valread = recv(sd , buffer, 4096, 0)) == 0)
 					_handle_disconnection(i, sd);
 				//Echo back the message that came in  
 				else {
