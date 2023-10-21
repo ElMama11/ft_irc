@@ -54,6 +54,24 @@ int MySocket::await_for_connection() {
 	this->_log_connection();
 	return clientSocket;
 }
+#include <vector>
+void splitMsg(std::string content)
+{
+	char *words = new char [content.length()+1]; //to copy string to chat to use strtok
+	std::strcpy(words, content.c_str()); 		//copy all client infos in words (cap, nick, user)
+	char *line = strtok(words, " ");			//split words into tokens with " "
+	std::vector<std::string> clientMsg;			//create tab with client infos
+	
+	while(line != NULL)
+	{
+		clientMsg.push_back(line);
+		line = strtok(NULL, "\r \n");
+	}
+	int i;
+	for (std::vector<std::string>::const_iterator i = clientMsg.begin(); i != clientMsg.end(); i++)
+		std::cout << *i << std::endl;
+	delete[] words;
+}
 
 void MySocket::handle() {
 	int max_sd;
@@ -96,10 +114,11 @@ void MySocket::handle() {
 					_handle_disconnection(i, sd);
 				//Echo back the message that came in  
 				else {
-					//set the string terminating NULL byte on the end of the data read  
+					//set the string terminating NULL byte on the end of the data read
 					buffer[valread] = '\0';   
 					send(sd, buffer, strlen(buffer), 0);
-					std::cout << buffer << std::endl;
+					std::cout << buffer;
+					splitMsg(buffer);
 				}
 			}
 		}
@@ -139,8 +158,8 @@ void MySocket::_accept_incoming_connection() {
 		for (i = 0; i < MAX_CLIENTS; i++) {
 			//if position is empty
 			if(this->_client_socket[i] == 0) {
-				this->_client_socket[i] = new_socket;   
-				std::cout << "Adding to list of sockets as " << i << std::endl;
+				this->_client_socket[i] = new_socket; 
+				std::cout << "Adding to list of sockets as " << i << std::endl << std::endl;
 				break;
 			}
 		}

@@ -5,13 +5,20 @@
 
 
 class User {
+
 	private :
+		int			_socket;
+		std::string	_nickname;
+		std::string	_username;
 
 	public :
 		User();
 		~User();
-		std::string nickname;
-		std::string username;
+
+		/* SETTERS */
+		void setSocket(int socket);
+		void setNickname(std::string nickname);
+		void setUsername(std::string username);
 	
 };
 #endif
