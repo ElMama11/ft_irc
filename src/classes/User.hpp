@@ -3,6 +3,7 @@
 
 # include <string>
 # include <vector>
+# include <iostream>
 
 
 class User {
@@ -15,7 +16,7 @@ class User {
 
 	public :
 		User();
-		User(int aSocket, std::string aNickname, std::string anUsername, std::string aRealname);
+		User(std::vector<std::string> clientMsg);
 		User(const User &cpy);
 		User &operator=(const User &rhs);
 		~User();

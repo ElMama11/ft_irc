@@ -56,7 +56,7 @@ int MySocket::awaitForConnection() {
 }
 
 #include <vector>
-void splitMsg(std::string content)
+std::vector<std::string> splitMsg(std::string content)
 {
 	char *words = new char [content.length()+1]; //to copy string to chat to use strtok
 	std::strcpy(words, content.c_str()); 		//copy all client infos in words (cap, nick, user)
@@ -68,10 +68,11 @@ void splitMsg(std::string content)
 		clientMsg.push_back(line);
 		line = strtok(NULL, "\r \n");
 	}
-	int i;
-	for (std::vector<std::string>::const_iterator i = clientMsg.begin(); i != clientMsg.end(); i++)
-		std::cout << *i << std::endl;
+	// int i;
+	// for (std::vector<std::string>::const_iterator i = clientMsg.begin(); i != clientMsg.end(); i++)
+	// 	std::cout << *i << std::endl;
 	delete[] words;
+	return clientMsg;
 }
 
 void MySocket::handle() {
@@ -119,7 +120,8 @@ void MySocket::handle() {
 					buffer[valread] = '\0';   
 					send(sd, buffer, strlen(buffer), 0);
 					std::cout << buffer;
-					splitMsg(buffer);
+					std::vector<std::string> oui = splitMsg(buffer);
+					User myUser(oui);
 				}
 			}
 		}

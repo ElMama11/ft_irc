@@ -3,7 +3,10 @@
 User::User() {
 }
 
-User::User(int aSocket, std::string aNickname, std::string anUsername, std::string aRealname) : _socket(aSocket), _nickname(aNickname), _username(anUsername), _realname(aRealname) {
+User::User(std::vector<std::string> clientMsg) {
+	_nickname = clientMsg[1];
+	std::cout << "USEREFWUE " << _nickname << std::endl;
+
 }
 
 User::User(const User &cpy) {
