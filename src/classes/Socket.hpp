@@ -27,10 +27,10 @@
 class MySocket {
 
 	private:
-		void	_log_connection();
-		void	_handle_multiples_connection();
-		void	_accept_incoming_connection();
-		void	_handle_disconnection(int i, int sd);
+		void	_logConnection();
+		void	_handleMultiplesConnection();
+		void	_acceptIncomingConnection();
+		void	_handleDisconnection(int i, int sd);
 
 		fd_set	_readfds;
 		int		_client_socket[MAX_CLIENTS];
@@ -43,10 +43,10 @@ class MySocket {
 
 		void	init();
 		void	mark();
-		int		await_for_connection();
-		void	soc_bind();
+		int		awaitForConnection();
+		void	socBind();
 		void	handle();
-		void	set_socfd(int socfd);
+		void	setSocfd(int socfd);
 
 		int			socfd;
 		int			port;

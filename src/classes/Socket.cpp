@@ -21,10 +21,10 @@ void MySocket::init() {
 	if (this->socfd == -1)
 		throw createSocketError();
 	std::cout << "INIT OK" << std::endl;
-	_handle_multiples_connection();
+	_handleMultiplesConnection();
 }
 
-void MySocket::soc_bind() {
+void MySocket::socBind() {
 	this->hint.sin_family = this->address_family;
 	this->hint.sin_port = htons(this->port);
 	this->hint.sin_addr.s_addr = INADDR_ANY;
@@ -41,7 +41,7 @@ void MySocket::mark() {
 	std::cout << "MARK OK" << std::endl;
 }
 
-int MySocket::await_for_connection() {
+int MySocket::awaitForConnection() {
 	socklen_t clientsize = sizeof(client);
 	memset(this->host, 0, NI_MAXHOST);
 	memset(this->service, 0, NI_MAXSERV);
@@ -51,9 +51,10 @@ int MySocket::await_for_connection() {
 		std::cerr << "Problem with the client connecting" << std::endl;
 		return -4;
 	}
-	this->_log_connection();
+	this->_logConnection();
 	return clientSocket;
 }
+
 #include <vector>
 void splitMsg(std::string content)
 {
@@ -104,14 +105,14 @@ void MySocket::handle() {
 		if ((activity < 0) && (errno != EINTR))
 			std::cerr << "Error: select()" << std::endl;
 		//If something happened on the master socket, then its an incoming connection
-		_accept_incoming_connection();
+		_acceptIncomingConnection();
 		//else its some IO operation on some other socket 
 		for (i = 0; i < MAX_CLIENTS; i++) {
 			sd = this->_client_socket[i];
 			if (FD_ISSET(sd , &this->_readfds)) {
 				//Check if it was for closing , and also read the incoming message  
 				if ((valread = recv(sd , buffer, 4096, 0)) == 0)
-					_handle_disconnection(i, sd);
+					_handleDisconnection(i, sd);
 				//Echo back the message that came in  
 				else {
 					//set the string terminating NULL byte on the end of the data read
@@ -125,13 +126,13 @@ void MySocket::handle() {
 	}
 }
 
-void MySocket::set_socfd(int socfd) {
+void MySocket::setSocfd(int socfd) {
 	this->socfd = socfd;
 }
 
 /* PRIVATE FUNCTIONS */
 
-void MySocket::_log_connection() {
+void MySocket::_logConnection() {
 	int result = getnameinfo((sockaddr*)&(this->client), sizeof(this->client), this->host, NI_MAXHOST, this->service, NI_MAXSERV, 0);
 	if (result)
 		std::cout << this->host << " connected on " << this->service << std::endl;
@@ -141,13 +142,13 @@ void MySocket::_log_connection() {
 	}
 }
 
-void MySocket::_handle_multiples_connection() {
+void MySocket::_handleMultiplesConnection() {
 	int opt = 1;
 	if (setsockopt(this->socfd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0)
 		throw setSockOptError();
 }
 
-void MySocket::_accept_incoming_connection() {
+void MySocket::_acceptIncomingConnection() {
 	int i = 0, new_socket = 0;
 	if (FD_ISSET(this->socfd, &this->_readfds)) {
 		if ((new_socket = accept(this->socfd, (struct sockaddr *)&hint, (socklen_t*)&this->_hintlen)) < 0) 
@@ -166,7 +167,7 @@ void MySocket::_accept_incoming_connection() {
 	}
 }
 
-void MySocket::_handle_disconnection(int i, int sd) {
+void MySocket::_handleDisconnection(int i, int sd) {
 	//Somebody disconnected , get his details and print
 	getpeername(sd, (struct sockaddr*)&this->hint, (socklen_t*)&this->_hintlen);
 	printf("Host disconnected, ip %s, port %d \n", inet_ntoa(this->hint.sin_addr), ntohs(this->hint.sin_port));   

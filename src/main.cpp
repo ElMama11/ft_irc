@@ -10,7 +10,7 @@ int main(int ac, char **av) {
 
 	try {
 		master_socket->init();
-		master_socket->soc_bind();
+		master_socket->socBind();
 		master_socket->mark();
 		master_socket->handle();
 	}
