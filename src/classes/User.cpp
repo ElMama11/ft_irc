@@ -3,9 +3,7 @@
 User::User() {
 }
 
-User::User(std::vector<std::string> clientMsg) {
-	_nickname = clientMsg[1];
-	std::cout << "USEREFWUE " << _nickname << std::endl;
+User::User(int socket) : _socket(socket) {
 
 }
 
@@ -28,10 +26,6 @@ User::~User() {
 
 /* FUNC */
 
-void parseRegistration(std::vector<std::string> clientMsg) {
-
-}
-
 /* GETTERS */
 
 int User::getSocket() {
@@ -48,4 +42,22 @@ std::string User::getUsername() {
 
 std::string User::getRealname() {
 	return _realname;
+}
+
+/* SETTERS */
+
+void User::setSocket(int socket) {
+	_socket = socket;
+}
+
+void User::setNickname(std::string nickname) {
+	_nickname = nickname;
+}
+
+void User::setUsername(std::string username) {
+	_username = username;
+}
+
+void User::setRealname(std::string realname) {
+	_realname = realname;
 }

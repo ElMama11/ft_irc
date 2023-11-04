@@ -11,9 +11,9 @@ PATHOBJ = obj/
 
 PATHSRC = src/
 
-HEAD =   src/classes/Socket.hpp
+HEAD =   src/classes/Server.hpp src/classes/User.hpp src/classes/Executor.hpp
 
-FILES = main.cpp classes/Socket.cpp
+FILES = main.cpp classes/Server.cpp classes/User.cpp classes/Executor.cpp
 
 SRCS = $(addprefix $(PATHSRC)/,$(FILES))
 

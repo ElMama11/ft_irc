@@ -13,21 +13,26 @@ class User {
 		std::string	_nickname;
 		std::string	_username;
 		std::string _realname;
+		User();
 
 	public :
-		User();
-		User(std::vector<std::string> clientMsg);
+		User(int socket);
 		User(const User &cpy);
 		User &operator=(const User &rhs);
 		~User();
 
 		/* FUNC */
-		void parseRegistration(std::vector<std::string> clientMsg);
 	
 		/* GETTERS */
 		int getSocket();
 		std::string getNickname();
 		std::string getUsername();
 		std::string getRealname();
+
+		/* SETTERS */
+		void setSocket(int socket);
+		void setNickname(std::string nickname);
+		void setUsername(std::string username);
+		void setRealname(std::string realname);
 };
 #endif

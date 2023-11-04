@@ -1,5 +1,5 @@
-#ifndef SOCKET_HPP
-# define SOCKET_HPP
+#ifndef SERVER_HPP
+# define SERVER_HPP
 
 # include <iostream>
 # include <sys/types.h>
@@ -13,18 +13,22 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <errno.h>
+# include <map>
+# include <list>
+# include <vector>
 # include "User.hpp"
+# include "Executor.hpp"
 
 
 # define MAX_CLIENTS 30
 
 // class SocketsManager {
 // 	public:
-// 		MySocket connection_handler;
-// 		MySocket *socs;
+// 		Server connection_handler;
+// 		Server *socs;
 // };
 
-class MySocket {
+class Server {
 
 	private:
 		void	_logConnection();
@@ -33,13 +37,17 @@ class MySocket {
 		void	_handleDisconnection(int i, int sd);
 
 		fd_set	_readfds;
-		int		_client_socket[MAX_CLIENTS];
+		std::vector<int> _client_socket;
 		int		_hintlen;
+
+		std::vector<User>	_users;
+		Executor		*_executor;
+		
 
 	public:
 	
-		MySocket(const char *ip, int port, int address_family, int type);
-		~MySocket();
+		Server(const char *ip, int port, int address_family, int type);
+		~Server();
 
 		void	init();
 		void	mark();
@@ -47,6 +55,9 @@ class MySocket {
 		void	socBind();
 		void	handle();
 		void	setSocfd(int socfd);
+
+		User	*getUserBySocket(int socket);
+		User	*getUserByUsername(std::string username);
 
 		int			socfd;
 		int			port;

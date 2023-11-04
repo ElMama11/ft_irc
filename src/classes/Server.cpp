@@ -1,7 +1,8 @@
-#include "Socket.hpp"
+#include "Server.hpp"
 
-MySocket::MySocket(const char *ip, int port, int address_family, int type) {
-		std::cout << "MySocket constructor." << std::endl;
+Server::Server(const char *ip, int port, int address_family, int type) {
+		std::cout << "Server constructor." << std::endl;
+		this->_executor = new Executor(this);
 		memset(this->buffer, 0, 4096);
 		this->socfd = 0;
 		this->ip = ip;
@@ -10,13 +11,13 @@ MySocket::MySocket(const char *ip, int port, int address_family, int type) {
 		this->type = type;
 	};
 
-MySocket::~MySocket() {
-	std::cout << "MySocket destructor." << std::endl;
+Server::~Server() {
+	std::cout << "Server destructor." << std::endl;
 }
 
 /* MEMBER FUNCTIONS*/
 
-void MySocket::init() {
+void Server::init() {
 	this->socfd = socket(this->address_family, this->type, 0);
 	if (this->socfd == -1)
 		throw createSocketError();
@@ -24,7 +25,7 @@ void MySocket::init() {
 	_handleMultiplesConnection();
 }
 
-void MySocket::socBind() {
+void Server::socBind() {
 	this->hint.sin_family = this->address_family;
 	this->hint.sin_port = htons(this->port);
 	this->hint.sin_addr.s_addr = INADDR_ANY;
@@ -35,13 +36,32 @@ void MySocket::socBind() {
 	std::cout << "Bind ok, listener on port " << this->port << std::endl;
 }
 
-void MySocket::mark() {
+void Server::mark() {
 	if (listen(this->socfd, SOMAXCONN) < 0)
 		throw markSocketError();
 	std::cout << "MARK OK" << std::endl;
 }
 
-int MySocket::awaitForConnection() {
+
+User *Server::getUserBySocket(int socket) {
+	std::vector<User>::iterator it = _users.begin();
+	for (it; it < _users.end(); it++) {
+		if ((*it).getSocket() == socket)
+			return &(*it);
+	}
+	return NULL;
+}
+
+User *Server::getUserByUsername(std::string username) {
+	std::vector<User>::iterator it = _users.begin();
+	for (it; it < _users.end(); it++) {
+		if ((*it).getUsername() == username)
+			return &(*it);
+	}
+	return NULL;
+}
+
+int Server::awaitForConnection() {
 	socklen_t clientsize = sizeof(client);
 	memset(this->host, 0, NI_MAXHOST);
 	memset(this->service, 0, NI_MAXSERV);
@@ -55,34 +75,10 @@ int MySocket::awaitForConnection() {
 	return clientSocket;
 }
 
-#include <vector>
-std::vector<std::string> splitMsg(std::string content)
-{
-	char *words = new char [content.length()+1]; //to copy string to chat to use strtok
-	std::strcpy(words, content.c_str()); 		//copy all client infos in words (cap, nick, user)
-	char *line = strtok(words, " ");			//split words into tokens with " "
-	std::vector<std::string> clientMsg;			//create tab with client infos
-	
-	while(line != NULL)
-	{
-		clientMsg.push_back(line);
-		line = strtok(NULL, "\r \n");
-	}
-	// int i;
-	// for (std::vector<std::string>::const_iterator i = clientMsg.begin(); i != clientMsg.end(); i++)
-	// 	std::cout << *i << std::endl;
-	delete[] words;
-	return clientMsg;
-}
-
-void MySocket::handle() {
+void Server::handle() {
 	int max_sd;
 	this->_hintlen = sizeof(this->hint);
 	int i = 0, sd = 0, activity = 0, valread = 0;
-	//initialise all client_socket[] to 0 so not checked  
-	for (i = 0; i < MAX_CLIENTS; i++) {
-		this->_client_socket[i] = 0;
-	}
 	while (true) {
 		//Clear buffer & socket set
 		memset(this->buffer, 0, 4096);
@@ -91,7 +87,7 @@ void MySocket::handle() {
 		FD_SET(this->socfd, &this->_readfds);
 		max_sd = this->socfd;
 		//add child sockets to set
-		for (i = 0; i < MAX_CLIENTS; i++) {   
+		for (i = 0; i < _client_socket.size(); i++) {   
 			//socket descriptor
 			sd = this->_client_socket[i];
 			//if valid socket descriptor then add to read list
@@ -108,7 +104,8 @@ void MySocket::handle() {
 		//If something happened on the master socket, then its an incoming connection
 		_acceptIncomingConnection();
 		//else its some IO operation on some other socket 
-		for (i = 0; i < MAX_CLIENTS; i++) {
+		for (i = 0; i < _client_socket.size(); i++) {
+			this->_executor->setUserPtr(getUserBySocket(_client_socket[i]));
 			sd = this->_client_socket[i];
 			if (FD_ISSET(sd , &this->_readfds)) {
 				//Check if it was for closing , and also read the incoming message  
@@ -120,21 +117,22 @@ void MySocket::handle() {
 					buffer[valread] = '\0';   
 					send(sd, buffer, strlen(buffer), 0);
 					std::cout << buffer;
-					std::vector<std::string> oui = splitMsg(buffer);
-					User myUser(oui);
+					this->_executor->parseBuffer(buffer);
+					_executor->execOPs();
 				}
 			}
 		}
 	}
 }
 
-void MySocket::setSocfd(int socfd) {
+
+void Server::setSocfd(int socfd) {
 	this->socfd = socfd;
 }
 
 /* PRIVATE FUNCTIONS */
 
-void MySocket::_logConnection() {
+void Server::_logConnection() {
 	int result = getnameinfo((sockaddr*)&(this->client), sizeof(this->client), this->host, NI_MAXHOST, this->service, NI_MAXSERV, 0);
 	if (result)
 		std::cout << this->host << " connected on " << this->service << std::endl;
@@ -144,36 +142,44 @@ void MySocket::_logConnection() {
 	}
 }
 
-void MySocket::_handleMultiplesConnection() {
+void Server::_handleMultiplesConnection() {
 	int opt = 1;
 	if (setsockopt(this->socfd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0)
 		throw setSockOptError();
 }
 
-void MySocket::_acceptIncomingConnection() {
+void Server::_acceptIncomingConnection() {
 	int i = 0, new_socket = 0;
 	if (FD_ISSET(this->socfd, &this->_readfds)) {
 		if ((new_socket = accept(this->socfd, (struct sockaddr *)&hint, (socklen_t*)&this->_hintlen)) < 0) 
 			throw acceptSocketError();
 		//inform user of socket number - used in send and receive commands
 		printf("New connection, socket fd is %d, ip is : %s, port : %d \n", new_socket, inet_ntoa(this->hint.sin_addr), ntohs(this->hint.sin_port));
+		
+		this->_client_socket.push_back(new_socket);
+		User tmp(new_socket);
+		this->_users.push_back(tmp);
+		std::cout << "Adding to list of sockets as " << this->_client_socket.size() -1 << std::endl << std::endl;
 		//add new socket to array of sockets
-		for (i = 0; i < MAX_CLIENTS; i++) {
-			//if position is empty
-			if(this->_client_socket[i] == 0) {
-				this->_client_socket[i] = new_socket; 
-				std::cout << "Adding to list of sockets as " << i << std::endl << std::endl;
-				break;
-			}
-		}
+		// for (i = 0; i < MAX_CLIENTS; i++) {
+		// 	//if position is empty
+		// 	if(this->_client_socket[i] == 0) {
+		// 		this->_client_socket[i] = new_socket; 
+		// 		User tmp(new_socket);
+		// 		_users->push_back(tmp);
+		// 		std::cout << "Adding to list of sockets as " << i << std::endl << std::endl;
+		// 		break;
+		// 	}
+		// }
 	}
 }
 
-void MySocket::_handleDisconnection(int i, int sd) {
+void Server::_handleDisconnection(int i, int sd) {
 	//Somebody disconnected , get his details and print
 	getpeername(sd, (struct sockaddr*)&this->hint, (socklen_t*)&this->_hintlen);
 	printf("Host disconnected, ip %s, port %d \n", inet_ntoa(this->hint.sin_addr), ntohs(this->hint.sin_port));   
 	//Close the socket and mark as 0 in list for reuse  
 	close(sd);
-	this->_client_socket[i] = 0;
+	this->_client_socket.erase(this->_client_socket.begin() + i);
+	this->_users[i].setSocket(0);
 }
