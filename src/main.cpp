@@ -17,7 +17,7 @@ int main(int ac, char **av) {
 		std::cerr << e.what() << std::endl;
 	}
 
-	close(master_socket->socfd);
+	close(master_socket->serverSocket);
 	delete master_socket;
 	return 0;
 }

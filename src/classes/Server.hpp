@@ -36,39 +36,39 @@ class Server {
 		void	_acceptIncomingConnection();
 		void	_handleDisconnection(int i, int sd);
 
-		fd_set	_readfds;
-		std::vector<int> _client_socket;
-		int		_hintlen;
-
+		fd_set				_readfds;
+		std::vector<int>	_client_socket;
+		int					_hintlen;
 		std::vector<User>	_users;
-		Executor		*_executor;
+		Executor			*_executor;
+		int					_port;
+		int					_address_family;
+		int					_type;
+		char				_host[NI_MAXHOST];
+		char				_service[NI_MAXSERV];
+		char				_buffer[4096];
+		const char			*_ip;
+		sockaddr_in 		_hint;
+		sockaddr_in 		_client;
 		
 
 	public:
 	
 		Server(const char *ip, int port, int address_family, int type);
 		~Server();
-
 		void	init();
 		void	mark();
 		int		awaitForConnection();
 		void	socBind();
 		void	handle();
-		void	setSocfd(int socfd);
 
+		int		serverSocket;
+		
+		/* SETTERS & GETTERS */
+		void	setServerSocket(int servSock);
 		User	*getUserBySocket(int socket);
 		User	*getUserByUsername(std::string username);
 
-		int			socfd;
-		int			port;
-		int			address_family;
-		int			type;
-		char		host[NI_MAXHOST];
-		char		service[NI_MAXSERV];
-		char		buffer[4096];
-		const char	*ip;
-		sockaddr_in hint;
-		sockaddr_in client;
 
 		
 		/* ERROR CLASSES*/

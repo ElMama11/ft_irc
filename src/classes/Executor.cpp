@@ -34,8 +34,8 @@ void Executor::parseBuffer(std::string content) {
 		int splitter = tmp.find(' ');
 		std::string type = tmp.substr(0, splitter);
 		OP op = {
-			type: tmp.substr(0, splitter),
-			content: tmp.substr(splitter+1, tmp.size())
+			.type = tmp.substr(0, splitter),
+			.content = tmp.substr(splitter+1, tmp.size())
 		};
 		this->ops.push_back(op);
 	}
