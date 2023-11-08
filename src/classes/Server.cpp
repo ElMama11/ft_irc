@@ -105,8 +105,8 @@ void Server::handle() {
 				else {
 					_buffer[valread] = '\0';   
 					std::cout << _buffer;
-					//this->_executor->parseBuffer(buffer);
-					//_executor->execOPs();
+					this->_executor->parseBuffer(_buffer);
+					_executor->execOPs();
 				}
 			}
 		}

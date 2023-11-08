@@ -31,7 +31,7 @@ class Executor {
 
 		mapFunc _mapping;
 		Server *_server;
-		User *_user_ptr;
+		User *_userPtr;
 	public:
 		Executor(Server *ptr);
 		~Executor(void);

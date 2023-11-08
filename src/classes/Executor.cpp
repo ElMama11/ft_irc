@@ -2,7 +2,7 @@
 
 Executor::Executor(Server *ptr) {
 	this->_server = ptr;
-	this->_user_ptr = NULL;
+	this->_userPtr = NULL;
 	this->_mapping["CAP"] = &Executor::_cap;
 	this->_mapping["NICK"] = &Executor::_nick;
 	this->_mapping["USER"] = &Executor::_user;
@@ -42,7 +42,7 @@ void Executor::parseBuffer(std::string content) {
 }
 
 void Executor::setUserPtr(User *ptr) {
-	this->_user_ptr = ptr;
+	this->_userPtr = ptr;
 }
 
 
@@ -51,12 +51,12 @@ void Executor::_cap(std::string content) {
 }
 
 void Executor::_nick(std::string content) {
-	_user_ptr->setNickname(content);
+	_userPtr->setNickname(content);
 
 }
 
 void Executor::_quit(std::string content) {
-	std::cout << "QUIT: USER SOCKET: " << this->_user_ptr->getSocket() << std::endl;
+	std::cout << "QUIT: USER SOCKET: " << this->_userPtr->getSocket() << std::endl;
 }
 
 void Executor::_user(std::string content) {
@@ -66,9 +66,15 @@ void Executor::_user(std::string content) {
 	while (std::getline(iss, tmp, ' '))
 		params.push_back(tmp);
 	if (params.size() > 0)
-		this->_user_ptr->setUsername(params[0]);
+		this->_userPtr->setUsername(params[0]);
 	if (params.size() >= 4)
-		this->_user_ptr->setRealname(params[3]);
-	std::string msg = (":irc " + RPL_WELCOME + std::string(" ") + _user_ptr->getNickname() + "Welcome to the MamaIRC Network, " + _user_ptr->getNickname());
-	send(_user_ptr->getSocket(), msg.c_str(), msg.size(), 0);
+		this->_userPtr->setRealname(params[3]);
+	std::string msg;
+	msg += "001 ";
+	msg += _userPtr->getNickname();
+	msg += " :Welcome to the irc Network, ";
+	msg += _userPtr->getNickname();
+	msg += "\n";
+	std::cout << msg.c_str() << std::endl;
+	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
