@@ -77,35 +77,34 @@ int Server::awaitForConnection() {
 
 void Server::handle() {
 
-	this->_hintlen = sizeof(_hint);
+	_hintlen = sizeof(_hint);
 	int i = 0, activity = 0, valread = 0;
 	while (true) {
 		//Clear buffer & socket set
 		memset(_buffer, 0, 4096);
-		FD_ZERO(&this->_readfds);
-		FD_SET(this->serverSocket, &this->_readfds);
+		FD_ZERO(&_readfds);
+		FD_SET(this->serverSocket, &_readfds);
 		//add child sockets to set
 		for (i = 0; i < _client_socket.size(); i++) {   
 			//if valid socket descriptor then add to read list
-			if(this->_client_socket[i] > 0)
-				FD_SET(this->_client_socket[i] , &this->_readfds);
+			if(_client_socket[i] > 0)
+				FD_SET(_client_socket[i] , &_readfds);
 		}
 		//wait for an activity on one of the sockets, timeout is NULL, so wait indefinitely  
-		activity = select(FD_SETSIZE, &this->_readfds , NULL , NULL , NULL);
+		activity = select(FD_SETSIZE, &_readfds , NULL , NULL , NULL);
 		if ((activity < 0) && (errno != EINTR))
 			std::cerr << "Error: select()" << std::endl;
 		//If something happened on the master socket, then its an incoming connection else its some IO operation on some other socket 
 		_acceptIncomingConnection();
 		for (i = 0; i < _client_socket.size(); i++) {
-			this->_executor->setUserPtr(getUserBySocket(_client_socket[i]));
-			if (FD_ISSET(this->_client_socket[i] , &this->_readfds)) {
+			_executor->setUserPtr(getUserBySocket(_client_socket[i]));
+			if (FD_ISSET(_client_socket[i] , &_readfds)) {
 				//Check if it was for closing , and also read the incoming message  
-				if ((valread = recv(this->_client_socket[i] , _buffer, 4096, 0)) == 0)
-					_handleDisconnection(i, this->_client_socket[i]);
+				if ((valread = recv(_client_socket[i] , _buffer, 4096, 0)) == 0)
+					_handleDisconnection(i, _client_socket[i]);
 				else {
-					_buffer[valread] = '\0';   
 					std::cout << _buffer;
-					this->_executor->parseBuffer(_buffer);
+					_executor->parseBuffer(_buffer);
 					_executor->execOPs();
 				}
 			}
@@ -134,35 +133,24 @@ void Server::_handleMultiplesConnection() {
 
 void Server::_acceptIncomingConnection() {
 	int i = 0, new_socket = 0;
-	if (FD_ISSET(this->serverSocket, &this->_readfds)) {
-		if ((new_socket = accept(this->serverSocket, (struct sockaddr *)&_hint, (socklen_t*)&this->_hintlen)) < 0) 
+	if (FD_ISSET(this->serverSocket, &_readfds)) {
+		if ((new_socket = accept(this->serverSocket, (struct sockaddr *)&_hint, (socklen_t*)&_hintlen)) < 0) 
 			throw acceptSocketError();
 		printf("New connection, socket fd is %d, ip is : %s, port : %d \n", new_socket, inet_ntoa(_hint.sin_addr), ntohs(_hint.sin_port));
-		this->_client_socket.push_back(new_socket);
+		_client_socket.push_back(new_socket);
 		User tmp(new_socket);
-		this->_users.push_back(tmp);
-		std::cout << "Adding to list of sockets as " << this->_client_socket.size() -1 << std::endl << std::endl;
-		//add new socket to array of sockets
-		// for (i = 0; i < MAX_CLIENTS; i++) {
-		// 	//if position is empty
-		// 	if(this->_client_socket[i] == 0) {
-		// 		this->_client_socket[i] = new_socket; 
-		// 		User tmp(new_socket);
-		// 		_users->push_back(tmp);
-		// 		std::cout << "Adding to list of sockets as " << i << std::endl << std::endl;
-		// 		break;
-		// 	}
-		// }
+		_users.push_back(tmp);
+		std::cout << "Adding to list of sockets as " << _client_socket.size() -1 << std::endl << std::endl;
 	}
 }
 
 void Server::_handleDisconnection(int i, int sd) {
-	getpeername(sd, (struct sockaddr*)&_hint, (socklen_t*)&this->_hintlen);
+	getpeername(sd, (struct sockaddr*)&_hint, (socklen_t*)&_hintlen);
 	printf("Host disconnected, ip %s, port %d \n", inet_ntoa(_hint.sin_addr), ntohs(_hint.sin_port));   
 	//Close the socket and mark as 0 in list for reuse  
 	close(sd);
-	this->_client_socket.erase(this->_client_socket.begin() + i);
-	this->_users[i].setSocket(0);
+	_client_socket.erase(_client_socket.begin() + i);
+	_users[i].setSocket(0);
 }
 
 /* SETTERS */

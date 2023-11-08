@@ -75,6 +75,5 @@ void Executor::_user(std::string content) {
 	msg += " :Welcome to the irc Network, ";
 	msg += _userPtr->getNickname();
 	msg += "\n";
-	std::cout << msg.c_str() << std::endl;
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
