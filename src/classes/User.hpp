@@ -4,6 +4,7 @@
 # include <string>
 # include <vector>
 # include <iostream>
+# include <cstring>
 
 
 class User {
@@ -20,6 +21,10 @@ class User {
 		User(const User &cpy);
 		User &operator=(const User &rhs);
 		~User();
+
+		bool findNl(char *str);
+
+		char buffer[4096];
 
 		/* FUNC */
 	

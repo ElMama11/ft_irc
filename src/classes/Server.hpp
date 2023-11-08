@@ -46,7 +46,6 @@ class Server {
 		int					_type;
 		char				_host[NI_MAXHOST];
 		char				_service[NI_MAXSERV];
-		char				_buffer[4096];
 		const char			*_ip;
 		sockaddr_in 		_hint;
 		sockaddr_in 		_client;

@@ -3,7 +3,6 @@
 Server::Server(const char *ip, int port, int address_family, int type) {
 		std::cout << "Server constructor." << std::endl;
 		_executor = new Executor(this);
-		memset(_buffer, 0, 4096);
 		this->serverSocket = 0;
 		_ip = ip;
 		_port = port;
@@ -81,7 +80,6 @@ void Server::handle() {
 	int i = 0, activity = 0, valread = 0;
 	while (true) {
 		//Clear buffer & socket set
-		memset(_buffer, 0, 4096);
 		FD_ZERO(&_readfds);
 		FD_SET(this->serverSocket, &_readfds);
 		//add child sockets to set
@@ -100,12 +98,16 @@ void Server::handle() {
 			_executor->setUserPtr(getUserBySocket(_client_socket[i]));
 			if (FD_ISSET(_client_socket[i] , &_readfds)) {
 				//Check if it was for closing , and also read the incoming message  
-				if ((valread = recv(_client_socket[i] , _buffer, 4096, 0)) == 0)
+				if ((valread = recv(_client_socket[i] , _executor->getUserPtr()->buffer, 4096, 0)) == 0)
 					_handleDisconnection(i, _client_socket[i]);
 				else {
-					std::cout << _buffer;
-					_executor->parseBuffer(_buffer);
-					_executor->execOPs();
+					std::cout << _executor->getUserPtr()->buffer;
+					//GERER LE MEMSET AU \n
+					if (_executor->getUserPtr()->findNl(_executor->getUserPtr()->buffer)) {
+						_executor->parseBuffer(_executor->getUserPtr()->buffer);
+						memset(_executor->getUserPtr()->buffer, 0, 4096);
+						_executor->execOPs();
+					}
 				}
 			}
 		}

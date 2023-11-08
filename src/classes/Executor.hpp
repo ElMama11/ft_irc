@@ -22,7 +22,6 @@ struct OP {
 class Executor {
 
 	private:
-
 		void _cap(std::string content);
 		void _nick(std::string content);
 		void _user(std::string content);
@@ -32,14 +31,17 @@ class Executor {
 		mapFunc _mapping;
 		Server *_server;
 		User *_userPtr;
+
 	public:
 		Executor(Server *ptr);
 		~Executor(void);
 		void parseBuffer(std::string content);
 		void execOPs(void);
-		void setUserPtr(User *ptr);
 		std::vector<OP>	ops;
-	protected:
+
+		/* GETTERS & SETTERS*/
+		void setUserPtr(User *ptr);
+		User *getUserPtr();
 };
 
 #endif

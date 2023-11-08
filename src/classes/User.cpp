@@ -4,7 +4,7 @@ User::User() {
 }
 
 User::User(int socket) : _socket(socket) {
-
+	memset(this->buffer, 0, 4096);
 }
 
 User::User(const User &cpy) {
@@ -25,6 +25,12 @@ User::~User() {
 }
 
 /* FUNC */
+
+bool User::findNl(char *str) {
+	for(int j = 0; str[j] == '\n'; j++)
+		return true;
+	return false;
+}
 
 /* GETTERS */
 

@@ -41,9 +41,6 @@ void Executor::parseBuffer(std::string content) {
 	}
 }
 
-void Executor::setUserPtr(User *ptr) {
-	this->_userPtr = ptr;
-}
 
 
 void Executor::_cap(std::string content) {
@@ -76,4 +73,12 @@ void Executor::_user(std::string content) {
 	msg += _userPtr->getNickname();
 	msg += "\n";
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+}
+ /* GETTERS & SETTERS */
+void Executor::setUserPtr(User *ptr) {
+	this->_userPtr = ptr;
+}
+
+User *Executor::getUserPtr() {
+	return _userPtr;
 }
