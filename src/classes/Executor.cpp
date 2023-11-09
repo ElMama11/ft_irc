@@ -7,6 +7,8 @@ Executor::Executor(Server *ptr) {
 	this->_mapping["NICK"] = &Executor::_nick;
 	this->_mapping["USER"] = &Executor::_user;
 	this->_mapping["QUIT"] = &Executor::_quit;
+	this->_mapping["JOIN"] = &Executor::_join;
+	this->_mapping["PASS"] = &Executor::_pass;
 	return ;
 }
 
@@ -18,6 +20,7 @@ void Executor::execOPs(void) {
 	size_t size = this->ops.size();
 	for (int i = 0; i < size; i++) {
 		func f = _mapping[ops[i].type];
+		//std::cout << _mapping[ops[i].type] << _mapping[ops[i].content] << std::endl;
 		(this->*f)(ops[i].content);		
 	}
 }
@@ -53,7 +56,7 @@ void Executor::_nick(std::string content) {
 }
 
 void Executor::_quit(std::string content) {
-	std::cout << "QUIT: USER SOCKET: " << this->_userPtr->getSocket() << std::endl;
+	std::cout << "func _quit: USER SOCKET: " << this->_userPtr->getSocket() << std::endl;
 }
 
 void Executor::_user(std::string content) {
@@ -74,6 +77,20 @@ void Executor::_user(std::string content) {
 	msg += "\n";
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
+
+void Executor::_join(std::string content) {
+	std::string msg;
+	msg += ":";
+	msg += msg += _userPtr->getNickname();
+	msg += " JOIN :#abcd";
+	msg += "\n";
+	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+}
+
+void Executor::_pass(std::string content) {
+	
+}
+
  /* GETTERS & SETTERS */
 void Executor::setUserPtr(User *ptr) {
 	this->_userPtr = ptr;

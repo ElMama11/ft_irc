@@ -1,9 +1,10 @@
 #include "Server.hpp"
 
-Server::Server(const char *ip, int port, int address_family, int type) {
+Server::Server(const char *ip, int port, int address_family, int type, std::string password) {
 		std::cout << "Server constructor." << std::endl;
 		_executor = new Executor(this);
 		this->serverSocket = 0;
+		_password = password;
 		_ip = ip;
 		_port = port;
 		_address_family = address_family;

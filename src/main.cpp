@@ -6,7 +6,7 @@ int main(int ac, char **av) {
 		std::cerr << "USAGE : ./ircserv <port> <password>" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	Server *master_socket = new Server("0.0.0.0", atoi(av[1]), AF_INET, SOCK_STREAM);
+	Server *master_socket = new Server("0.0.0.0", atoi(av[1]), AF_INET, SOCK_STREAM, av[2]);
 	try {
 		master_socket->init();
 		master_socket->socBind();
