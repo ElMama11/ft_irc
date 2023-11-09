@@ -77,9 +77,11 @@ int Server::awaitForConnection() {
 void Server::handle() {
 
 	_hintlen = sizeof(_hint);
-	int i = 0, activity = 0, valread = 0;
+	int i = 0, j = 0, activity = 0, valread = 0;
+	char tmpBuff[4096];
 	while (true) {
 		//Clear buffer & socket set
+		memset(tmpBuff, 0, 4096);
 		FD_ZERO(&_readfds);
 		FD_SET(this->serverSocket, &_readfds);
 		//add child sockets to set
@@ -98,12 +100,13 @@ void Server::handle() {
 			_executor->setUserPtr(getUserBySocket(_client_socket[i]));
 			if (FD_ISSET(_client_socket[i] , &_readfds)) {
 				//Check if it was for closing , and also read the incoming message  
-				if ((valread = recv(_client_socket[i] , _executor->getUserPtr()->buffer, 4096, 0)) == 0)
+				if ((valread = recv(_client_socket[i] , tmpBuff, 4096, 0)) == 0)
 					_handleDisconnection(i, _client_socket[i]);
 				else {
-					std::cout << _executor->getUserPtr()->buffer;
-					//GERER LE MEMSET AU \n
+					for (j = 0; _executor->getUserPtr()->buffer[j] != '\0'; j++);
+					strcpy(_executor->getUserPtr()->buffer + j, tmpBuff);
 					if (_executor->getUserPtr()->findNl(_executor->getUserPtr()->buffer)) {
+						std::cout << _executor->getUserPtr()->buffer << std::flush;
 						_executor->parseBuffer(_executor->getUserPtr()->buffer);
 						memset(_executor->getUserPtr()->buffer, 0, 4096);
 						_executor->execOPs();

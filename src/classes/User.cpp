@@ -27,8 +27,9 @@ User::~User() {
 /* FUNC */
 
 bool User::findNl(char *str) {
-	for(int j = 0; str[j] == '\n'; j++)
-		return true;
+	for(int j = 0; str[j] != '\0'; j++)
+		if (str[j] == '\n')
+			return true;
 	return false;
 }
 
