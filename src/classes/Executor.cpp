@@ -19,6 +19,8 @@ Executor::~Executor(void) {
 void Executor::execOPs(void) {
 	size_t size = this->ops.size();
 	for (int i = 0; i < size; i++) {
+		if (_mapping.find(ops[i].type) == _mapping.end())
+			break;
 		func f = _mapping[ops[i].type];
 		(this->*f)(ops[i].content);		
 	}
