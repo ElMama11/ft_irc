@@ -19,15 +19,7 @@
 # include "User.hpp"
 # include "Executor.hpp"
 
-
-# define MAX_CLIENTS 30
-
-// class SocketsManager {
-// 	public:
-// 		Server connection_handler;
-// 		Server *socs;
-// };
-
+class Executor;
 class Server {
 
 	private:
@@ -47,26 +39,29 @@ class Server {
 		char				_host[NI_MAXHOST];
 		char				_service[NI_MAXSERV];
 		const char			*_ip;
+		std::string			_password;
 		sockaddr_in 		_hint;
 		sockaddr_in 		_client;
 		
 
 	public:
 	
-		Server(const char *ip, int port, int address_family, int type);
+		Server(const char *ip, int port, int address_family, int type, std::string password);
 		~Server();
-		void	init();
-		void	mark();
-		int		awaitForConnection();
-		void	socBind();
-		void	handle();
+		void		init();
+		void		mark();
+		int			awaitForConnection();
+		void		socBind();
+		void		handle();
+		void		errorMsg(std::string reason, int clientSocket);
 
 		int		serverSocket;
 		
 		/* SETTERS & GETTERS */
-		void	setServerSocket(int servSock);
-		User	*getUserBySocket(int socket);
-		User	*getUserByUsername(std::string username);
+		void		setServerSocket(int servSock);
+		User		*getUserBySocket(int socket);
+		User		*getUserByUsername(std::string username);
+		std::string	getPassword();
 
 
 		

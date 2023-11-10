@@ -7,6 +7,8 @@ Executor::Executor(Server *ptr) {
 	this->_mapping["NICK"] = &Executor::_nick;
 	this->_mapping["USER"] = &Executor::_user;
 	this->_mapping["QUIT"] = &Executor::_quit;
+	this->_mapping["JOIN"] = &Executor::_join;
+	this->_mapping["PASS"] = &Executor::_pass;
 	return ;
 }
 
@@ -53,7 +55,7 @@ void Executor::_nick(std::string content) {
 }
 
 void Executor::_quit(std::string content) {
-	std::cout << "QUIT: USER SOCKET: " << this->_userPtr->getSocket() << std::endl;
+	std::cout << "func _quit: USER SOCKET: " << this->_userPtr->getSocket() << std::endl;
 }
 
 void Executor::_user(std::string content) {
@@ -74,6 +76,27 @@ void Executor::_user(std::string content) {
 	msg += "\n";
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
+
+void Executor::_join(std::string content) {
+	std::string msg;
+	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+}
+
+void Executor::_pass(std::string content) {
+	if (_server->getPassword().compare(content) == 0)
+		return ;
+	else {
+		std::string msg = ":ft_irc ";
+		msg += "464 ";
+		msg += _userPtr->getNickname();
+		msg += " :Password Incorrect";
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		_server->errorMsg(":Closing Link: localhost (Bad Password or no password supplied) <connection gets terminated by the server>\n", _userPtr->getSocket());
+	}
+	
+	
+}
+
  /* GETTERS & SETTERS */
 void Executor::setUserPtr(User *ptr) {
 	this->_userPtr = ptr;

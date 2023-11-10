@@ -1,9 +1,11 @@
 #include "Server.hpp"
 
-Server::Server(const char *ip, int port, int address_family, int type) {
+Server::Server(const char *ip, int port, int address_family, int type, std::string password) {
 		std::cout << "Server constructor." << std::endl;
 		_executor = new Executor(this);
 		this->serverSocket = 0;
+		_password = password;
+		_password += 13;
 		_ip = ip;
 		_port = port;
 		_address_family = address_family;
@@ -12,6 +14,7 @@ Server::Server(const char *ip, int port, int address_family, int type) {
 
 Server::~Server() {
 	std::cout << "Server destructor." << std::endl;
+	delete _executor;
 }
 
 /* MEMBER FUNCTIONS*/
@@ -42,23 +45,6 @@ void Server::mark() {
 }
 
 
-User *Server::getUserBySocket(int socket) {
-	
-	for (std::vector<User>::iterator it = _users.begin(); it < _users.end(); it++) {
-		if ((*it).getSocket() == socket)
-			return &(*it);
-	}
-	return NULL;
-}
-
-User *Server::getUserByUsername(std::string username) {
-	
-	for (std::vector<User>::iterator it = _users.begin(); it < _users.end(); it++) {
-		if ((*it).getUsername() == username)
-			return &(*it);
-	}
-	return NULL;
-}
 
 int Server::awaitForConnection() {
 	socklen_t clientsize = sizeof(_client);
@@ -118,6 +104,25 @@ void Server::handle() {
 }
 
 
+void Server::errorMsg(std::string reason, int clientSocket) {
+	std::string msg = "ERROR: ";
+	msg += reason;
+	send(clientSocket, msg.c_str(), msg.size(), 0);
+	for (std::vector<int>::iterator it = _client_socket.begin(); it != _client_socket.end(); it++)
+	{
+		if ((*it) == clientSocket) {
+			_client_socket.erase(it);
+			break;
+		}
+	}
+	for (std::vector<User>::iterator ite = _users.begin(); ite != _users.end(); ite++) {
+		if((*ite).getSocket() == clientSocket) {
+			_users.erase(ite);
+			break;
+		}
+	}
+	close(clientSocket);
+}
 /* PRIVATE FUNCTIONS */
 
 void Server::_logConnection() {
@@ -155,11 +160,33 @@ void Server::_handleDisconnection(int i, int sd) {
 	//Close the socket and mark as 0 in list for reuse  
 	close(sd);
 	_client_socket.erase(_client_socket.begin() + i);
-	_users[i].setSocket(0);
+	_users.erase(_users.begin() + i);
 }
 
-/* SETTERS */
+/* GETTERS & SETTERS */
 
 void Server::setServerSocket(int servSock) {
 	this->serverSocket = servSock;
+}
+
+User *Server::getUserBySocket(int socket) {
+	
+	for (std::vector<User>::iterator it = _users.begin(); it < _users.end(); it++) {
+		if ((*it).getSocket() == socket)
+			return &(*it);
+	}
+	return NULL;
+}
+
+User *Server::getUserByUsername(std::string username) {
+	
+	for (std::vector<User>::iterator it = _users.begin(); it < _users.end(); it++) {
+		if ((*it).getUsername() == username)
+			return &(*it);
+	}
+	return NULL;
+}
+
+std::string Server::getPassword() {
+	return _password;
 }

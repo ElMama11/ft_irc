@@ -8,7 +8,9 @@
 # include <sys/socket.h>
 # include "User.hpp"
 # include "ServerReply.hpp"
+# include "Server.hpp"
 
+class User;
 class Server;
 class Executor;
 typedef void (Executor::*func)(std::string content);
@@ -26,7 +28,8 @@ class Executor {
 		void _nick(std::string content);
 		void _user(std::string content);
 		void _quit(std::string content);
-
+		void _join(std::string content);
+		void _pass(std::string content);
 
 		mapFunc _mapping;
 		Server *_server;
