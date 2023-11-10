@@ -20,7 +20,6 @@ void Executor::execOPs(void) {
 	size_t size = this->ops.size();
 	for (int i = 0; i < size; i++) {
 		func f = _mapping[ops[i].type];
-		//std::cout << _mapping[ops[i].type] << _mapping[ops[i].content] << std::endl;
 		(this->*f)(ops[i].content);		
 	}
 }
@@ -80,14 +79,21 @@ void Executor::_user(std::string content) {
 
 void Executor::_join(std::string content) {
 	std::string msg;
-	msg += ":";
-	msg += msg += _userPtr->getNickname();
-	msg += " JOIN :#abcd";
-	msg += "\n";
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
 
 void Executor::_pass(std::string content) {
+	if (_server->getPassword().compare(content) == 0)
+		return ;
+	else {
+		std::string msg = ":ft_irc ";
+		msg += "464 ";
+		msg += _userPtr->getNickname();
+		msg += " :Password Incorrect";
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		_server->errorMsg(":Closing Link: localhost (Bad Password or no password supplied) <connection gets terminated by the server>\n", _userPtr->getSocket());
+	}
+	
 	
 }
 

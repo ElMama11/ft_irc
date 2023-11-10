@@ -8,7 +8,9 @@
 # include <sys/socket.h>
 # include "User.hpp"
 # include "ServerReply.hpp"
+# include "Server.hpp"
 
+class User;
 class Server;
 class Executor;
 typedef void (Executor::*func)(std::string content);

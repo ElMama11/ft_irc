@@ -19,6 +19,7 @@
 # include "User.hpp"
 # include "Executor.hpp"
 
+class Executor;
 class Server {
 
 	private:
@@ -47,18 +48,20 @@ class Server {
 	
 		Server(const char *ip, int port, int address_family, int type, std::string password);
 		~Server();
-		void	init();
-		void	mark();
-		int		awaitForConnection();
-		void	socBind();
-		void	handle();
+		void		init();
+		void		mark();
+		int			awaitForConnection();
+		void		socBind();
+		void		handle();
+		void		errorMsg(std::string reason, int clientSocket);
 
 		int		serverSocket;
 		
 		/* SETTERS & GETTERS */
-		void	setServerSocket(int servSock);
-		User	*getUserBySocket(int socket);
-		User	*getUserByUsername(std::string username);
+		void		setServerSocket(int servSock);
+		User		*getUserBySocket(int socket);
+		User		*getUserByUsername(std::string username);
+		std::string	getPassword();
 
 
 		
