@@ -68,8 +68,11 @@ void Executor::_user(std::string content) {
 	for (std::vector<OP>::iterator it = ops.begin(); it != ops.end(); it++) {
 		if ((*it).type == "PASS")
 			break;
-		if (it == ops.end())
-			//clean
+		if (it == ops.end() - 1) {
+			_server->cleanAnUser(_userPtr->getSocket());
+			//envoyer la bonne erreur
+			return ;
+		}
 	}
 	while (std::getline(iss, tmp, ' '))
 		params.push_back(tmp);

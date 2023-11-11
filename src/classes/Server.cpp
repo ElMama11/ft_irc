@@ -126,12 +126,16 @@ void Server::errorMsg(std::string reason, int clientSocket) {
 
 void Server::cleanAnUser(int userSocket) {
 	for (std::vector<int>::iterator it = _client_socket.begin(); it != _client_socket.end(); it++) {
-		if ((*it) == userSocket)
+		if ((*it) == userSocket) {
 			_client_socket.erase(it);
+			break;
+		}
 	}
 	for (std::vector<User>::iterator it = _users.begin(); it != _users.end(); it++) {
-		if ((*it).getSocket() == userSocket)
+		if ((*it).getSocket() == userSocket) {
 			_users.erase(it);
+			break;
+		}
 	}
 	close(userSocket);
 }
