@@ -123,6 +123,18 @@ void Server::errorMsg(std::string reason, int clientSocket) {
 	}
 	close(clientSocket);
 }
+
+void Server::cleanAnUser(int userSocket) {
+	for (std::vector<int>::iterator it = _client_socket.begin(); it != _client_socket.end(); it++) {
+		if ((*it) == userSocket)
+			_client_socket.erase(it);
+	}
+	for (std::vector<User>::iterator it = _users.begin(); it != _users.end(); it++) {
+		if ((*it).getSocket() == userSocket)
+			_users.erase(it);
+	}
+	close(userSocket);
+}
 /* PRIVATE FUNCTIONS */
 
 void Server::_logConnection() {

@@ -54,6 +54,7 @@ class Server {
 		void		socBind();
 		void		handle();
 		void		errorMsg(std::string reason, int clientSocket);
+		void		cleanAnUser(int userSocket);
 
 		int		serverSocket;
 		
