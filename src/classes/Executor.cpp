@@ -64,6 +64,13 @@ void Executor::_user(std::string content) {
 	std::istringstream iss(content);
 	std::string tmp;
 	std::vector<std::string> params;
+
+	for (std::vector<OP>::iterator it = ops.begin(); it != ops.end(); it++) {
+		if ((*it).type == "PASS")
+			break;
+		if (it == ops.end())
+			//clean
+	}
 	while (std::getline(iss, tmp, ' '))
 		params.push_back(tmp);
 	if (params.size() > 0)
