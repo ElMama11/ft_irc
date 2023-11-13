@@ -90,7 +90,10 @@ void Executor::_user(std::string content) {
 }
 
 void Executor::_join(std::string content) {
+
 	std::string msg;
+	if (!isChannel(content))
+		
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
 
@@ -105,8 +108,6 @@ void Executor::_pass(std::string content) {
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 		_server->errorMsg(":Closing Link: localhost (Bad Password or no password supplied) <connection gets terminated by the server>\n", _userPtr->getSocket());
 	}
-	
-	
 }
 
  /* GETTERS & SETTERS */
@@ -116,4 +117,12 @@ void Executor::setUserPtr(User *ptr) {
 
 User *Executor::getUserPtr() {
 	return _userPtr;
+}
+
+bool Executor::isChannel(std::string channel)
+{
+	for(std::vector<Channel *>::iterator it = _channel.begin(); it != _channel.end(); it++)
+		if (channel == (*it)->getName())
+			return (true);
+	return (false);
 }

@@ -9,6 +9,7 @@
 # include "User.hpp"
 # include "ServerReply.hpp"
 # include "Server.hpp"
+# include "Channel.hpp"
 
 class User;
 class Server;
@@ -34,6 +35,7 @@ class Executor {
 		mapFunc _mapping;
 		Server *_server;
 		User *_userPtr;
+		std::vector<Channel *> _channel;
 
 	public:
 		Executor(Server *ptr);
@@ -45,6 +47,8 @@ class Executor {
 		/* GETTERS & SETTERS*/
 		void setUserPtr(User *ptr);
 		User *getUserPtr();
+
+		bool isChannel(std::string channel);
 };
 
 #endif
