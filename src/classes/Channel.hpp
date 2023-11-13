@@ -12,9 +12,12 @@ class	Channel
 		std::string					_name;
 		std::string					_pass;
 		std::vector<User *>			_user;
-		std::vector<User *>			_op;
+		std::vector<User * >			_op;
 
 	public:
+		Channel(std::string chanName, User *userPtr);
+		~Channel(void);
+
 		bool		getInviteOnly(void);
 		void		setInviteOnly(bool b);
 
