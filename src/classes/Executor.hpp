@@ -32,10 +32,12 @@ class Executor {
 		void _join(std::string content);
 		void _pass(std::string content);
 
+		void _createChannel(std::string content);
+
 		mapFunc _mapping;
 		Server *_server;
 		User *_userPtr;
-		std::vector<Channel *> _channel;
+		std::vector<Channel> _channels;
 
 	public:
 		Executor(Server *ptr);

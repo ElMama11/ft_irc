@@ -1,5 +1,16 @@
 #include "Channel.hpp"
 
+Channel::Channel(std::string chanName, User *userPtr): _name(chanName) {
+	_inviteOnly = false;
+	_userLimits = 999;
+	_topic = "";
+	_pass = "";
+	addUser(userPtr, true);
+}
+
+Channel::~Channel(void) {
+}
+
 void		Channel::setInviteOnly(bool b)
 {
 	_inviteOnly = b;

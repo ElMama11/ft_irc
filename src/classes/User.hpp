@@ -25,6 +25,7 @@ class User {
 		bool findNl(char *str);
 
 		char buffer[4096];
+		bool checkPassword;
 
 		/* FUNC */
 	

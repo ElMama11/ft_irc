@@ -1,2 +1,15 @@
 - Pour la ft accept(), donner une structaddr du client accepte si besoin
-- definer les rpl
+- erreur 461 quand entre pas d'user et de realname et 431 quand pas de nick
+
+
+:nickkk!~userrrr@76ED6C91.46AC8DCE.328630EA.IP JOIN :#
+:lion.anthrochat.net 332 nickkk # :Welcome to the Pound - The Sacred Island on IRC (^_^;;
+:lion.anthrochat.net 333 nickkk # Falkor 1688665382
+:lion.anthrochat.net 353 nickkk @ # :nickkk +Redacted @Falkor @Suntop +neko 
+:lion.anthrochat.net 366 nickkk # :End of /NAMES list.
+
+
+:nickss!~usernnn@76ED6C91.46AC8DCE.328630EA.IP JOIN :#channnn
+:lion.anthrochat.net MODE #channnn +nt 
+:lion.anthrochat.net  nickss = #channnn :@nickss 
+:lion.anthrochat.net 363536 nickss #channnn :End of /NAMES list.

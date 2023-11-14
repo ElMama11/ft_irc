@@ -65,14 +65,10 @@ void Executor::_user(std::string content) {
 	std::string tmp;
 	std::vector<std::string> params;
 
-	for (std::vector<OP>::iterator it = ops.begin(); it != ops.end(); it++) {
-		if ((*it).type == "PASS")
-			break;
-		if (it == ops.end() - 1) {
-			_server->cleanAnUser(_userPtr->getSocket());
-			//envoyer la bonne erreur
-			return ;
-		}
+	if (_userPtr->checkPassword == false) {
+		_pass("");
+		//envoyer la bonne erreur ?
+		return;
 	}
 	while (std::getline(iss, tmp, ' '))
 		params.push_back(tmp);
@@ -90,17 +86,35 @@ void Executor::_user(std::string content) {
 }
 
 void Executor::_join(std::string content) {
-
 	std::string msg;
-	if (!isChannel(content))
+
+	std::string firstword;
+	std::istringstream iss(content);
+	iss >> firstword;
+
+	if (firstword.find('#') == -1 || firstword == "#") {
+		std::cout << "error 403" << std::endl; //403 NICK CHAN :No such channel
+		return ;
+	}
+	if (!isChannel(content)) {
+		_createChannel(content);
+	}
 		
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
 
 void Executor::_pass(std::string content) {
-	if (_server->getPassword().compare(content) == 0)
+	if(content.find(13) != -1) {
+		//std::cout << _server->getPassword() << "\t----------\t" << content << std::endl;
+		content.erase(content.find(13));
+	}
+	std::cout << _server->getPassword() << "\t\t" << content << std::endl;
+	if (_server->getPassword().compare(content) == 0) {
+		_userPtr->checkPassword = true;
 		return ;
+	}
 	else {
+		//std::cout << content << " && " << _server->getPassword().compare(content) <<  std::endl;
 		std::string msg = ":ft_irc ";
 		msg += "464 ";
 		msg += _userPtr->getNickname();
@@ -108,6 +122,17 @@ void Executor::_pass(std::string content) {
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 		_server->errorMsg(":Closing Link: localhost (Bad Password or no password supplied) <connection gets terminated by the server>\n", _userPtr->getSocket());
 	}
+}
+
+void Executor::_createChannel(std::string content) {
+	Channel newChan(content, _userPtr);
+	_channels.push_back(newChan);
+	std::string nickname = _userPtr->getNickname();
+	std::string msg = RPL_JOIN(nickname, content);
+	send(_userPtr->getSocket(), msg.c_str(), sizeof(msg), 0);
+
+
+
 }
 
  /* GETTERS & SETTERS */
@@ -121,8 +146,8 @@ User *Executor::getUserPtr() {
 
 bool Executor::isChannel(std::string channel)
 {
-	for(std::vector<Channel *>::iterator it = _channel.begin(); it != _channel.end(); it++)
-		if (channel == (*it)->getName())
+	for(std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); it++)
+		if (channel == (*it).getName())
 			return (true);
 	return (false);
 }
