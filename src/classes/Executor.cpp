@@ -65,15 +65,10 @@ void Executor::_user(std::string content) {
 	std::string tmp;
 	std::vector<std::string> params;
 
-	std::cout << ops[0].type << ops[1].type << ops[2].type << std::endl;
-	for (std::vector<OP>::iterator it = ops.begin(); it != ops.end(); it++) {
-		if ((*it).type == "PASS")
-			break;
-		if (it == ops.end() - 1) {
-			_server->cleanAnUser(_userPtr->getSocket());
-			//envoyer la bonne erreur
-			return ;
-		}
+	if (_userPtr->checkPassword == false) {
+		_pass("");
+		//envoyer la bonne erreur ?
+		return;
 	}
 	while (std::getline(iss, tmp, ' '))
 		params.push_back(tmp);
@@ -110,14 +105,16 @@ void Executor::_join(std::string content) {
 
 void Executor::_pass(std::string content) {
 	if(content.find(13) != -1) {
-		std::cout << _server->getPassword() << "\t----------\t" << content << std::endl;
+		//std::cout << _server->getPassword() << "\t----------\t" << content << std::endl;
 		content.erase(content.find(13));
 	}
 	std::cout << _server->getPassword() << "\t\t" << content << std::endl;
-	if (_server->getPassword().compare(content) == 0)
+	if (_server->getPassword().compare(content) == 0) {
+		_userPtr->checkPassword = true;
 		return ;
+	}
 	else {
-		std::cout << content << " && " << _server->getPassword().compare(content) <<  std::endl;
+		//std::cout << content << " && " << _server->getPassword().compare(content) <<  std::endl;
 		std::string msg = ":ft_irc ";
 		msg += "464 ";
 		msg += _userPtr->getNickname();

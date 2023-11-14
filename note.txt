@@ -1,5 +1,5 @@
 - Pour la ft accept(), donner une structaddr du client accepte si besoin
-- Pb dans _user quand on se connecte avec nc
+- erreur 461 quand entre pas d'user et de realname et 431 quand pas de nick
 
 
 :nickkk!~userrrr@76ED6C91.46AC8DCE.328630EA.IP JOIN :#
