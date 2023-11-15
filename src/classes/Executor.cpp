@@ -1,4 +1,5 @@
 #include "Executor.hpp"
+#include "Channel.hpp"
 
 Executor::Executor(Server *ptr) {
 	this->_server = ptr;
@@ -126,7 +127,11 @@ void Executor::_createChannel(std::string content) {
 	std::string nickname = _userPtr->getNickname();
 	std::string msg = RPL_JOIN(nickname, content);
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-	msg = RPL_NAMERPLY(nickname, )
+	std::string g = newChan.getNicknameWithPrefix(_userPtr);
+	msg = RPL_NAMERPLY(_userPtr, newChan, g);
+	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	msg = RPL_ENDOFNAMES(newChan.getName());
+	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
 
  /* GETTERS & SETTERS */

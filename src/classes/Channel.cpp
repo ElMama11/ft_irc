@@ -190,3 +190,42 @@ size_t		Channel::totalUser(void)
 
 	return (nb);
 }
+
+
+
+bool	Channel::isOp(User *user)
+{
+	std::string	tmp;
+	std::vector<User *>::iterator it;
+
+	it = _user.begin();
+	while (it != _user.end())
+	{
+		if (user->getNickname() == (*it)->getNickname())
+			return (false);
+		it++;
+	}
+
+	it = _op.begin();
+	while (it != _op.end())
+	{
+		if (user->getNickname() == (*it)->getNickname())
+			return (true);
+		it++;
+	}
+	return (false);
+}
+
+std::string	Channel::getNicknameWithPrefix(User *user)
+{
+	std::string	tmp;
+	
+	if (isOp(user) == true)
+	{
+		tmp = "@";
+		tmp += user->getNickname();
+	}
+	else
+		tmp += user->getNickname();
+	return (tmp);
+}

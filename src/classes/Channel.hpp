@@ -40,6 +40,9 @@ class	Channel
 		User		*getUserByUsername(std::string userName);
 		size_t		totalUser(void);
 
+		std::string	getNicknameWithPrefix(User *user);
+		bool		isOp(User *user);
+
 };
 
 #endif
