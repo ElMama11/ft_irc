@@ -1,6 +1,6 @@
 - Pour la ft accept(), donner une structaddr du client accepte si besoin
 - erreur 461 quand entre pas d'user et de realname et 431 quand pas de nick
-
+- Si mdp pas bon, l'erreur dans _pass est cut.
 
 :nickkk!~userrrr@76ED6C91.46AC8DCE.328630EA.IP JOIN :#
 :lion.anthrochat.net 332 nickkk # :Welcome to the Pound - The Sacred Island on IRC (^_^;;
