@@ -98,6 +98,7 @@ void Executor::_join(std::string content) {
 }
 
 void Executor::_pass(std::string content) {
+	std::cout << "---" << content << "\t\t" << _server->getPassword() << std::endl;
 	if (_server->getPassword().compare(content) == 0)
 		return ;
 	else {

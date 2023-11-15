@@ -5,7 +5,6 @@ Server::Server(const char *ip, int port, int address_family, int type, std::stri
 		_executor = new Executor(this);
 		this->serverSocket = 0;
 		_password = password;
-		_password += 13;
 		_ip = ip;
 		_port = port;
 		_address_family = address_family;
