@@ -99,16 +99,12 @@ void Executor::_join(std::string content) {
 	if (!isChannel(content)) {
 		_createChannel(content);
 	}
-		
-	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
 
 void Executor::_pass(std::string content) {
 	if(content.find(13) != -1) {
-		//std::cout << _server->getPassword() << "\t----------\t" << content << std::endl;
 		content.erase(content.find(13));
 	}
-	std::cout << _server->getPassword() << "\t\t" << content << std::endl;
 	if (_server->getPassword().compare(content) == 0) {
 		_userPtr->checkPassword = true;
 		return ;
@@ -129,10 +125,8 @@ void Executor::_createChannel(std::string content) {
 	_channels.push_back(newChan);
 	std::string nickname = _userPtr->getNickname();
 	std::string msg = RPL_JOIN(nickname, content);
-	send(_userPtr->getSocket(), msg.c_str(), sizeof(msg), 0);
-
-
-
+	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	msg = RPL_NAMERPLY(nickname, )
 }
 
  /* GETTERS & SETTERS */

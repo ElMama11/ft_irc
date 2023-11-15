@@ -1,4 +1,4 @@
-# define SERV_NAME "irc_42"
+# define SERV_NAME "ft_irc"
 # define SERV_VERSION "Beta"
 
 # define OPER_NAME "admin"
