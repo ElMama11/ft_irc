@@ -22,7 +22,7 @@
 /* 331 */ #define RPL_NOTOPIC(client, channelName) ":" SERV_NAME " 331 " + client.getNickname() + " " + channelName + " :No topic is set" + "\n"
 /* 332 */ #define RPL_TOPIC(client, channelName, topicText) ":" SERV_NAME " 332 " + client.getNickname() + " " + channelName + " " + topicText + "\n"
 /* 341 */ #define RPL_INVITING(channelName, targetName) ":" SERV_NAME " 341 " + channelName + " " + targetName + "\n"
-/* 353 */ #define RPL_NAMERPLY(client, channel, name) ":" SERV_NAME " 353 " + client.getNickname() + " @ " + channel.getName() + " :" + name + "\n"
+/* 353 */ #define RPL_NAMERPLY(client, channel, name) ":" SERV_NAME " 353 " + client->getNickname() + " @ " + channel.getName() + " :" + name + "\n"
 /* 366 */ #define RPL_ENDOFNAMES(channelName) ":" SERV_NAME " 366 " + channelName + " :End of /NAMES list." + "\n"
 /* 401 */ #define ERR_NOSUCHNICK(client, channelName, targetName) ":" SERV_NAME " 401 " + client.getNickname() + " " + channelName + " " + targetName + " :No such nick/channel" + "\n"
 /* 401 */ #define ERR_NOSUCHNICKCHAN(client, channelName, targetName, command) ":" + client.getNickname() + " PRIVMSG " + channelName + " :Error " + command + ": No such nick (" + targetName + ")" + "\n"
