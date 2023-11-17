@@ -1,8 +1,14 @@
 #include "Channel.hpp"
+#include "limits.h"
+#include "../pr.cpp"
 
-Channel::Channel(std::string chanName, User *userPtr): _name(chanName) {
+Channel::Channel(std::string chanName, User *userPtr) {
+	for (std::string::size_type i = 0; i < chanName.length(); i++)
+		if (chanName[i] != '\r')
+			_name += chanName[i];
+	_topicRestrictionForOp = true;
 	_inviteOnly = false;
-	_userLimits = 999;
+	_userLimits = UINT_MAX;
 	_topic = "";
 	_pass = "";
 	addUser(userPtr, true);
@@ -16,6 +22,16 @@ void		Channel::setInviteOnly(bool b)
 	_inviteOnly = b;
 }
 
+bool		Channel::getTopicRestrictionForOp(void)
+{
+	return (_topicRestrictionForOp);
+}
+
+void		Channel::setTopicRestrictionForOp(bool b)
+{
+	_topicRestrictionForOp = b;
+}
+
 bool		Channel::getInviteOnly(void)
 {
 	return (_inviteOnly);
@@ -23,12 +39,12 @@ bool		Channel::getInviteOnly(void)
 
 
 
-void		Channel::setUserLimits(size_t limit)
+void		Channel::setUserLimits(unsigned int limit)
 {
 	_userLimits = limit;
 }
 
-size_t		Channel::getUserLimits(void)
+unsigned int		Channel::getUserLimits(void)
 {
 	return (_userLimits);
 }
@@ -37,7 +53,9 @@ size_t		Channel::getUserLimits(void)
 
 void		Channel::setName(std::string name)
 {
-	_name = name;
+	for (std::string::size_type i = 0; i < name.length(); i++)
+		if (name[i] != '\r')
+			_name += name[i];
 }
 
 std::string	Channel::getName(void)
@@ -77,19 +95,27 @@ void		Channel::addUser(User *user, bool op)
 		_op.push_back(user);
 	else
 		_user.push_back(user);
+	std::cout << "---" << user->getNickname() << std::endl;
 }
 
 void	Channel::delUser(User *user)
 {
 	std::vector<User *>::iterator it;
 
+	pr("333");
 	it = _op.begin();
+	pr("444");
+
 	while (it != _op.end())
 	{
 		if ((*it)->getSocket() == user->getSocket())
+		{
 			_op.erase(it);
+			break ;
+		}
 		it++;
 	}
+	pr("555");
 
 	it = _user.begin();
 	while (it != _user.begin())
@@ -169,9 +195,9 @@ User		*Channel::getUserByUsername(std::string userName)
 	return (NULL);
 }
 
-size_t		Channel::totalUser(void)
+unsigned int		Channel::totalUser(void)
 {
-	size_t	nb = 0;
+	unsigned int	nb = 0;
 	std::vector<User *>::iterator it;
 
 	it = _op.begin();
@@ -193,7 +219,7 @@ size_t		Channel::totalUser(void)
 
 
 
-bool	Channel::isOp(User *user)
+bool		Channel::isOp(User *user)
 {
 	std::string	tmp;
 	std::vector<User *>::iterator it;
@@ -228,4 +254,12 @@ std::string	Channel::getNicknameWithPrefix(User *user)
 	else
 		tmp += user->getNickname();
 	return (tmp);
+}
+
+bool		Channel::isUserByNickname(std::string nickname)
+{
+	for (std::vector<User *>::iterator it = _user.begin(); it != _user.end(); it++)
+		if (nickname != (*it)->getNickname())
+			return (true);
+	return (false);
 }

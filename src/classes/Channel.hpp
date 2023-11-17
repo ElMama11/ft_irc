@@ -6,42 +6,47 @@
 class	Channel
 {
 	private:
-		bool						_inviteOnly;
-		size_t						_userLimits;
-		std::string					_topic;
-		std::string					_name;
-		std::string					_pass;
-		std::vector<User *>			_user;
-		std::vector<User * >			_op;
+		bool					_topicRestrictionForOp;
+		bool					_inviteOnly;
+		size_t					_userLimits;
+		std::string				_topic;
+		std::string				_name;
+		std::string				_pass;
+		std::vector<User *>		_user;
+		std::vector<User * >	_op;
 
 	public:
 		Channel(std::string chanName, User *userPtr);
 		~Channel(void);
 
-		bool		getInviteOnly(void);
-		void		setInviteOnly(bool b);
+		bool			getTopicRestrictionForOp(void);
+		void			setTopicRestrictionForOp(bool b);
 
-		size_t		getUserLimits(void);
-		void		setUserLimits(size_t limit);
+		bool			getInviteOnly(void);
+		void			setInviteOnly(bool b);
 
-		std::string	getName(void);
-		void		setName(std::string name);
+		unsigned int	getUserLimits(void);
+		void			setUserLimits(unsigned int limit);
 
-		std::string	getTopic(void);
-		void		setTopic(std::string topic);
+		std::string		getName(void);
+		void			setName(std::string name);
 
-		std::string	getPass(void);
-		void		setPass(std::string pass);
+		std::string		getTopic(void);
+		void			setTopic(std::string topic);
 
-		User		*getUser(int sock);
-		void		addUser(User *user, bool op);
-		void		delUser(User *user);
-		User		*getUserByNickname(std::string nickName);
-		User		*getUserByUsername(std::string userName);
-		size_t		totalUser(void);
+		std::string		getPass(void);
+		void			setPass(std::string pass);
 
-		std::string	getNicknameWithPrefix(User *user);
-		bool		isOp(User *user);
+		User			*getUser(int sock);
+		void			addUser(User *user, bool op);
+		void			delUser(User *user);
+		User			*getUserByNickname(std::string nickName);
+		User			*getUserByUsername(std::string userName);
+		unsigned int	totalUser(void);
+
+		std::string		getNicknameWithPrefix(User *user);
+		bool			isOp(User *user);
+		bool			isUserByNickname(std::string nickname);
 
 };
 
