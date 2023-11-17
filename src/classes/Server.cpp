@@ -157,7 +157,7 @@ void Server::_handleMultiplesConnection() {
 }
 
 void Server::_acceptIncomingConnection() {
-	int i = 0, new_socket = 0;
+	int new_socket = 0;
 	if (FD_ISSET(this->serverSocket, &_readfds)) {
 		if ((new_socket = accept(this->serverSocket, (struct sockaddr *)&_hint, (socklen_t*)&_hintlen)) < 0) 
 			throw acceptSocketError();

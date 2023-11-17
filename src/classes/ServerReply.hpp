@@ -10,7 +10,7 @@
 #define RPL_KICK(senderNick, channelName, targetNick, reason) ":" + senderNick + " KICK " + channelName + " " + targetNick + " " + reason + "\n"
 #define RPL_MODE(user, channelName, message) ":" + user.getNickname() + "!~" + user.getUsername() + "@" SERV_NAME " MODE " + channelName + " " + message + "\n"
 
-/* 001 */ #define RPL_WELCOME(client) ":IRC 001 " + client.getNickname() + " :Welcome to the IRC network, " + client.getNickname() + "!" + "\n"
+/* 001 */ #define RPL_WELCOME(client) ":IRC 001 " + client->getNickname() + " :Welcome to the IRC network, " + client->getNickname() + "!" + "\n"
 /* 002 */ #define RPL_YOURHOST(client) ":IRC 002 " + client.getNickname() + " :Your host is 42_irc, running beta" + "\n"
 /* 003 */ #define RPL_CREATED(client, date) ":IRC 003 " + client.getNickname() + " :This server was created " + date + "\n"
 /* 005 */ #define RPL_ISUPPORT(client) ":IRC 005 " + client.getNickname() + " TARGMAX=INVITE:1,PART:1,JOIN:1,KICK:1,PRIVMSG:1,WHOIS:1 CHANTYPES=# :are supported by this server" + "\n"
@@ -30,9 +30,9 @@
 
 /* 404 */ #define ERR_CANNOTSENDTOCHAN(client, channelName) ":" SERV_NAME " 404 " + client.getNickname() + " " + channelName + " :Cannot send to channel" + "\n"
 
-/* 403 */ #define ERR_INVALIDCHANNEL(client, channelName) ":" SERV_NAME " 403 " + client.getNickname() + " " + channelName + " :Invalid channel name" + "\n"
+/* 403 */ #define ERR_INVALIDCHANNEL(client, channelName) ":" SERV_NAME " 403 " + client->getNickname() + " " + channelName + " :Invalid channel name" + "\n"
 /* 416 */ #define ERR_TOOMANYMATCHES(client) ":" SERV_NAME " 416 " + client.getNickname() + " :Command or message too long" + "\n"
-/* 421 */ #define ERR_UNKNOWNCOMMAND(command) ":" SERV_NAME " 421 " + command + " :Unknown command" + "\n"
+/* 421 */ #define ERR_UNKNOWNCOMMAND(client, command) ":" SERV_NAME " 421 " + client->getNickname() + " " + command + " :Unknown command" + "\n"
 /* 431 */ #define ERR_NONICKNAMEGIVEN(clientname) ":" SERV_NAME " 431 " + clientname + " :No nickname given" + "\n"
 /* 432 */ #define ERR_ERRONEUSNICKNAME(nickname) ":" SERV_NAME " 432 Error " + nickname + " :Erroneous nickname" + "\n"
 /* 433 */ #define ERR_NICKNAMEINUSE(clientName) ":" SERV_NAME " 433 * " + clientName + " :Nickname is already in use" + "\n"
@@ -41,11 +41,11 @@
 /* 443 */ #define ERR_USERONCHANNEL(targetName, channelName) ":" SERV_NAME " 443 " + targetName + " " + channelName + " :is already on channel" + "\n"
 /* 451 */ #define ERR_NOTREGISTERED(client) ":" SERV_NAME " 451 " + client.getNickname() + " :You have not registered" + "\n"
 /* 451 */ #define ERR_NOTREGISTERED_MSG(client, message) ":" SERV_NAME " 451 " + client.getNickname() + " :" + message + "\n"
-/* 461 */ #define ERR_NEEDMOREPARAMS(client, command) ":" SERV_NAME " 461 " + client.getNickname() + " " + command + " :Not enough parameters" + "\n"
+/* 461 */ #define ERR_NEEDMOREPARAMS(client, command) ":" SERV_NAME " 461 " + client-> + " " + command + " :Not enough parameters" + "\n"
 /* 462 */ #define ERR_TOOMANYPARAMS(command) ":" SERV_NAME " 462 " + command + " :Too many parameters" + "\n"
 /* 463 */ #define ERR_ALREADYREGISTRED(clientName) ":" SERV_NAME " 463 " + clientName + " :Already registered" + "\n"
 
-/* 464 */ #define ERR_PASSWDMISMATCH(client) ":IRC 464 " + client.getNickname() + " :Password incorrect" + "\n"
+/* 464 */ #define ERR_PASSWDMISMATCH(client) ":" SERV_NAME " 464 " + client->getNickname() + " :Password Incorrect" + "\n"
 
 /* 471 */ #define ERR_CHANNELISFULL(client, channelName) ":" SERV_NAME " 471 " + client.getNickname() + " " + channelName + " :Cannot join channel (+l) - channel is full, try again later" + "\n"
 /* 472 */ #define ERR_UNKNOWNMODE(client, channelName, char) ":" SERV_NAME " 472 " + client.getNickname() + " " + channelName + " " + char + " :is unknown mode char to me for me" + "\n"
