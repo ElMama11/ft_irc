@@ -13,6 +13,7 @@ Executor::Executor(Server *ptr) {
 	this->_mapping["JOIN"] = &Executor::_join;
 	this->_mapping["PASS"] = &Executor::_pass;
 	this->_mapping["MODE"] = &Executor::_mode;
+	//this->_mapping["PRIVMSG"] = &Executor::_privmsg;
 	return ;
 }
 
@@ -39,13 +40,15 @@ void Executor::execOPs(void) {
 void Executor::parseBuffer(std::string content) {
 	std::istringstream iss(content);
 	std::string tmp;
+	int pos = 0;
 
 	if (!(this->ops.empty())) {
 		this->ops.clear();
 	}
-
 	while (std::getline(iss, tmp, '\n')) {
 		int splitter = tmp.find(' ');
+		if (pos = tmp.find('\r'))
+			tmp = tmp.substr(0, pos);
 		std::string type = tmp.substr(0, splitter);
 		OP op = {
 			.type = tmp.substr(0, splitter),
@@ -102,7 +105,51 @@ void Executor::_join(std::string content) {
 	if (!isChannel(content)) {
 		_createChannel(content);
 	}
+	else {
+		Channel *chanToJoin = getChannelByName(content);
+		if (chanToJoin == NULL) {
+			std::cout << "ERROR CHANNEL DONT EXIST" << std::endl;
+			return;
+		}
+		else if (chanToJoin->countUsersInChannel() >= chanToJoin->getUserLimits()) {
+			std::cout << "PU DE PLACE" << std::endl;
+			return;
+		}
+		else if (chanToJoin->getInviteOnly() == true && _userPtr->isInvited(content) == false) {
+			std::cout << "LE CHAN EST EN INVIT ONLY" << std::endl;
+			return;
+		}
+		else if (chanToJoin->getPass() != "") {
+			int end, start = 0;
+			start = content.find(" ");
+			start++;
+			end = start;
+			while (content[end] != ' ' && content[end] != '\0')
+				end++; 
+			std::string userPass = content.substr(start, end - start);
+			if (userPass != chanToJoin->getPass()) {
+				std::cout << "NEED un mdp" << std::endl;
+				return;
+			}
+		}
+		else {
+			chanToJoin->addUser(_userPtr, false);
+			std::string msg = RPL_JOIN(_userPtr->getNickname(), content);
+			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+			msg = RPL_TOPIC(_userPtr, content, chanToJoin->getTopic());
+			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+			msg = RPL_NAMERPLY(_userPtr, (*chanToJoin), chanToJoin->getAllUsersForNameReply());
+			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+			msg = RPL_ENDOFNAMES(chanToJoin->getName());
+			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+			// renvoyer la rpl a tout le monde
+			User *tmp = chanToJoin->getUserByNickname("mama2");
+			msg = RPL_JOIN(_userPtr->getNickname(), content);
+			send(tmp->getSocket(), msg.c_str(), msg.size(), 0);
+		}	
+	}
 }
+
 
 void Executor::_pass(std::string content) {
 	if(content.find(13) != -1) {
@@ -156,7 +203,6 @@ std::string	Executor::nextWord(std::string::size_type i, std::string content)
 
 	while (content[end] != ' ' && content[end] != 13 && content[end] != '\0')
 		end++;
-	std::cout << "------" << content.substr(start, end - start) << std::endl;
 	return (content.substr(start, end - start));
 }
 
@@ -249,6 +295,14 @@ void Executor::_mode(std::string content)
 	}
 }
   
+Channel *Executor::getChannelByName(std::string channelName) {
+	for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); it++) {
+		if (it->getName() == channelName)
+			return &(*it);
+	}
+	return NULL;
+}
+
  /* GETTERS & SETTERS */
 void Executor::setUserPtr(User *ptr) {
 	this->_userPtr = ptr;

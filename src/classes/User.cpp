@@ -34,6 +34,14 @@ bool User::findNl(char *str) {
 	return false;
 }
 
+bool User::isInvited(std::string channelName) {
+	for (std::vector<std::string>::iterator it = invitationList.begin(); it != invitationList.end(); it++) {
+		if (channelName == *it)
+			return true;
+	}
+	return false;
+}
+
 /* GETTERS */
 
 int User::getSocket() {
@@ -62,7 +70,6 @@ void User::setNickname(std::string nickname) {
 	size_t	pos = nickname.find('\r');
 
 	_nickname = nickname.substr(0, pos);
-	std::cout << "-__-" << _nickname << std::endl;
 }
 
 void User::setUsername(std::string username) {

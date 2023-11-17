@@ -27,6 +27,8 @@ class	Channel
 
 		unsigned int	getUserLimits(void);
 		void			setUserLimits(unsigned int limit);
+		
+		unsigned int	countUsersInChannel();
 
 		std::string		getName(void);
 		void			setName(std::string name);
@@ -43,6 +45,7 @@ class	Channel
 		User			*getUserByNickname(std::string nickName);
 		User			*getUserByUsername(std::string userName);
 		unsigned int	totalUser(void);
+		std::string		getAllUsersForNameReply();
 
 		std::string		getNicknameWithPrefix(User *user);
 		bool			isOp(User *user);

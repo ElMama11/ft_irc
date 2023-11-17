@@ -20,7 +20,7 @@
 /* 324 */ #define RPL_CHANNELMODEIS(client, channel, mode) ":" SERV_NAME " 324 " + client.getNickname() + " " + channel + " " + mode + "\n"
 /* 329 */ #define RPL_CREATIONTIME(client, channel, theTime) ":" SERV_NAME " 329 " + client.getNickname() + " " + channel + " " + theTime + "\n"
 /* 331 */ #define RPL_NOTOPIC(client, channelName) ":" SERV_NAME " 331 " + client.getNickname() + " " + channelName + " :No topic is set" + "\n"
-/* 332 */ #define RPL_TOPIC(client, channelName, topicText) ":" SERV_NAME " 332 " + client.getNickname() + " " + channelName + " " + topicText + "\n"
+/* 332 */ #define RPL_TOPIC(client, channelName, topicText) ":" SERV_NAME " 332 " + client->getNickname() + " " + channelName + " " + topicText + "\n"
 /* 341 */ #define RPL_INVITING(channelName, targetName) ":" SERV_NAME " 341 " + channelName + " " + targetName + "\n"
 /* 353 */ #define RPL_NAMERPLY(client, channel, name) ":" SERV_NAME " 353 " + client->getNickname() + " @ " + channel.getName() + " :" + name + "\n"
 /* 366 */ #define RPL_ENDOFNAMES(channelName) ":" SERV_NAME " 366 " + channelName + " :End of /NAMES list." + "\n"
