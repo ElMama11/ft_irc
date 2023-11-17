@@ -225,12 +225,9 @@ void Executor::_mode(std::string content)
 				else if (arg == "-o")
 				{
 					User	*tmp = (*it).getUserByNickname(nextWord(i, content));
-					pr("111");
 					if ((*it).isOp(tmp))
 					{
-						pr("222");
 						(*it).delUser(tmp);
-						pr("999");
 						(*it).addUser(tmp, false);
 					}
 					else
@@ -249,6 +246,7 @@ void Executor::_mode(std::string content)
 			}
 		}
 	}
+}
   
  /* GETTERS & SETTERS */
 void Executor::setUserPtr(User *ptr) {
