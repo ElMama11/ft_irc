@@ -32,6 +32,7 @@ class Executor {
 		void _join(std::string content);
 		void _pass(std::string content);
 		void _mode(std::string content);
+		void _privmsg(std::string content);
 
 		void _createChannel(std::string content);
 
@@ -41,20 +42,22 @@ class Executor {
 		std::vector<Channel> _channels;
 
 	public:
+		std::vector<OP>	ops;
+
 		Executor(Server *ptr);
 		~Executor(void);
 		void parseBuffer(std::string content);
 		void execOPs(void);
-		std::vector<OP>	ops;
-
-		/* GETTERS & SETTERS*/
-		void setUserPtr(User *ptr);
-		User *getUserPtr();
+		Channel	*getChannelByName(std::string channelName);
 
 		bool isChannel(std::string channel);
 		bool isHash(std::string content);
 		std::string	nextWord(std::string::size_type i, std::string content);
 		bool	isDigit(std::string content);
+
+		/* GETTERS & SETTERS*/
+		void setUserPtr(User *ptr);
+		User *getUserPtr();
 
 };
 

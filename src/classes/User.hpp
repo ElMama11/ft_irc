@@ -14,6 +14,7 @@ class User {
 		std::string	_nickname;
 		std::string	_username;
 		std::string _realname;
+
 		User();
 
 	public :
@@ -23,9 +24,11 @@ class User {
 		~User();
 
 		bool findNl(char *str);
+		bool isInvited(std::string channelName);
 
 		char buffer[4096];
 		bool checkPassword;
+		std::vector<std::string> invitationList;
 
 		/* FUNC */
 	

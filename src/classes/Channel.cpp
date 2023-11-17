@@ -49,7 +49,23 @@ unsigned int		Channel::getUserLimits(void)
 	return (_userLimits);
 }
 
-
+unsigned int	Channel::countUsersInChannel()
+{
+	unsigned int count = 0;
+	std::vector<User *>::iterator it = _user.begin();
+	while (it != _user.end())
+	{
+		count++;
+		it++;
+	}
+	it = _op.begin();
+	while (it != _op.end())
+	{
+		count++;
+		it++;
+	}
+	return (count);
+}
 
 void		Channel::setName(std::string name)
 {
@@ -95,7 +111,6 @@ void		Channel::addUser(User *user, bool op)
 		_op.push_back(user);
 	else
 		_user.push_back(user);
-	std::cout << "---" << user->getNickname() << std::endl;
 }
 
 void	Channel::delUser(User *user)
@@ -259,4 +274,20 @@ bool		Channel::isUserByNickname(std::string nickname)
 		if (nickname != (*it)->getNickname())
 			return (true);
 	return (false);
+}
+
+std::string		Channel::getAllUsersForNameReply()
+{
+	std::string names;
+	for (std::vector<User *>::iterator it = _user.begin(); it != _user.end(); it++)
+	{
+		names += getNicknameWithPrefix(*(it));
+		names += " ";
+	}
+	for (std::vector<User *>::iterator it = _op.begin(); it != _op.end(); it++)
+	{
+		names += getNicknameWithPrefix(*(it));
+		names += " ";
+	}
+	return names;
 }
