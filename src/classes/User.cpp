@@ -59,7 +59,10 @@ void User::setSocket(int socket) {
 }
 
 void User::setNickname(std::string nickname) {
-	_nickname = nickname;
+	size_t	pos = nickname.find('\r');
+
+	_nickname = nickname.substr(0, pos);
+	std::cout << "-__-" << _nickname << std::endl;
 }
 
 void User::setUsername(std::string username) {

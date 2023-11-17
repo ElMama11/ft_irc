@@ -31,6 +31,7 @@ class Executor {
 		void _quit(std::string content);
 		void _join(std::string content);
 		void _pass(std::string content);
+		void _mode(std::string content);
 
 		void _createChannel(std::string content);
 
@@ -51,6 +52,10 @@ class Executor {
 		User *getUserPtr();
 
 		bool isChannel(std::string channel);
+		bool isHash(std::string content);
+		std::string	nextWord(std::string::size_type i, std::string content);
+		bool	isDigit(std::string content);
+
 };
 
 #endif

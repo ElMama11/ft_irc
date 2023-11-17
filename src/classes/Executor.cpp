@@ -1,5 +1,7 @@
 #include "Executor.hpp"
 #include "Channel.hpp"
+#include "../pr.cpp"
+#include <limits.h>
 
 Executor::Executor(Server *ptr) {
 	this->_server = ptr;
@@ -10,6 +12,7 @@ Executor::Executor(Server *ptr) {
 	this->_mapping["QUIT"] = &Executor::_quit;
 	this->_mapping["JOIN"] = &Executor::_join;
 	this->_mapping["PASS"] = &Executor::_pass;
+	this->_mapping["MODE"] = &Executor::_mode;
 	return ;
 }
 
@@ -23,7 +26,9 @@ void Executor::execOPs(void) {
 		if (_mapping.find(ops[i].type) == _mapping.end())
 			break;
 		func f = _mapping[ops[i].type];
-		(this->*f)(ops[i].content);		
+		(this->*f)(ops[i].content);	
+		ops[i].type[0] = '\0';
+		ops[i].content[0] = '\0';
 	}
 }
 
@@ -132,6 +137,8 @@ void Executor::_createChannel(std::string content) {
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	msg = RPL_ENDOFNAMES(newChan.getName());
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	// for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); it++)
+	// 	pr((*it).getName());   		Delete channel quand y a plus personne
 }
 
  /* GETTERS & SETTERS */
@@ -149,4 +156,114 @@ bool Executor::isChannel(std::string channel)
 		if (channel == (*it).getName())
 			return (true);
 	return (false);
+}
+
+bool Executor::isHash(std::string content)
+{
+	if (content[0] != '#')
+		return (false);
+	return (true);
+}
+
+std::string	Executor::nextWord(std::string::size_type i, std::string content)
+{
+	std::string::size_type start = i + 1;
+	std::string::size_type end = i + 1;
+
+	while (content[end] != ' ' && content[end] != 13 && content[end] != '\0')
+		end++;
+	std::cout << "------" << content.substr(start, end - start) << std::endl;
+	return (content.substr(start, end - start));
+}
+
+bool	Executor::isDigit(std::string content)
+{
+	for (int i = 0; content[i] != '\0'; i++)
+		if (!isdigit(content[i]))
+			return (false);
+	return (true);
+}
+
+void Executor::_mode(std::string content)
+{
+	std::string	arg;
+	size_t		pos = content.find(' ');
+	std::vector<Channel>::iterator it = _channels.begin();
+
+	std::string	firstWord = content.substr(0, pos);
+	pos = content.find('\r');
+	content = content.substr(0, pos);
+	while (it != _channels.end() && (*it).getName() != firstWord)
+		it++;
+	if (it == _channels.end())
+	{
+		std::cout << content << "---error, channel not found" << std::endl; // le channel n'existe pas
+		return ;
+	}
+	else if ((*it).isOp(_userPtr) == false)
+	{
+		std::cout << "error, you not operator in this channel" << std::endl; // n'est pas operator du channel
+		return ;
+	}
+	else
+	{
+		std::string::size_type start = 0;
+
+		for (std::string::size_type i = 0; i <= content.length(); i++)
+		{
+			if (content[i] == ' ' || i == content.length())
+			{
+				arg = content.substr(start, i - start);
+				if (arg == "+i")
+					(*it).setInviteOnly(true);
+				else if (arg == "-i")
+					(*it).setInviteOnly(false);
+				else if (arg == "+t")
+					(*it).setTopicRestrictionForOp(true);
+				else if (arg == "-t")
+					(*it).setTopicRestrictionForOp(false);
+				else if (arg == "+k")
+					(*it).setPass(nextWord(i, content));
+				else if (arg == "-k")
+					(*it).setPass("");
+				else if (arg == "+o")
+				{
+					std::string user = nextWord(i, content);
+
+					if ((*it).isUserByNickname(user))
+					{
+						User	*tmp = (*it).getUserByNickname(user);
+						(*it).delUser(tmp);
+						(*it).addUser(tmp, true);
+					}
+					else
+						std::cout << "error, user not found" << std::endl; // l'utilisateur cible n'est pas dans le channel
+				}
+				else if (arg == "-o")
+				{
+					User	*tmp = (*it).getUserByNickname(nextWord(i, content));
+					pr("111");
+					if ((*it).isOp(tmp))
+					{
+						pr("222");
+						(*it).delUser(tmp);
+						pr("999");
+						(*it).addUser(tmp, false);
+					}
+					else
+						std::cout << "error, user not operator" << std::endl; // l'utilisateur cible n'est pas dans la liste des operator, faire la distinction avec son absence dans le channel ?
+				}
+				else if (arg == "+l")
+				{
+					if (isDigit(nextWord(i, content)))
+						(*it).setUserLimits(static_cast<unsigned int>(std::atoi(nextWord(i, content).c_str())));
+					else
+						std::cout << "error, num only for user limit" << std::endl;
+				}
+				else if (arg == "-l")
+					(*it).setUserLimits(UINT_MAX);
+				start = i + 1;
+			}
+		}
+	}
 }

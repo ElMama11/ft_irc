@@ -13,7 +13,7 @@ PATHSRC = src/
 
 HEAD =   src/classes/Server.hpp src/classes/User.hpp src/classes/Executor.hpp src/classes/Channel.hpp
 
-FILES = main.cpp classes/Server.cpp classes/User.cpp classes/Executor.cpp classes/Channel.cpp
+FILES = main.cpp pr.cpp classes/Server.cpp classes/User.cpp classes/Executor.cpp classes/Channel.cpp
 
 SRCS = $(addprefix $(PATHSRC)/,$(FILES))
 
