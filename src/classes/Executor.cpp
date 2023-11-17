@@ -76,13 +76,13 @@ void Executor::_user(std::string content) {
 	if (_userPtr->checkPassword == false) {
 		_pass("");
 		return;
-	}
 	while (std::getline(iss, tmp, ' '))
 		params.push_back(tmp);
 	if (params.size() > 0)
 		this->_userPtr->setUsername(params[0]);
 	if (params.size() >= 4)
 		this->_userPtr->setRealname(params[3]);
+	}
 	std::string msg = RPL_WELCOME(_userPtr);
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
@@ -113,6 +113,7 @@ void Executor::_pass(std::string content) {
 		return ;
 	}
 	else {
+		_userPtr->setNickname("placeholder");
 		std::string msg = ERR_PASSWDMISMATCH(_userPtr);
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 		_server->errorMsg("ERROR :Closing Link: localhost (Bad Password)\n<connection gets terminated by the server>\n", _userPtr->getSocket());
