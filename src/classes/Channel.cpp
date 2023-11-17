@@ -102,9 +102,7 @@ void	Channel::delUser(User *user)
 {
 	std::vector<User *>::iterator it;
 
-	pr("333");
 	it = _op.begin();
-	pr("444");
 
 	while (it != _op.end())
 	{
@@ -115,7 +113,6 @@ void	Channel::delUser(User *user)
 		}
 		it++;
 	}
-	pr("555");
 
 	it = _user.begin();
 	while (it != _user.begin())
