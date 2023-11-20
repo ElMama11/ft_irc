@@ -2,13 +2,17 @@
 
 Server::Server(const char *ip, int port, int address_family, int type, std::string password) {
 		std::cout << "Server constructor." << std::endl;
+		FD_ZERO(&_readfds);
+		_hintlen = 0;
 		_executor = new Executor(this);
-		this->serverSocket = 0;
-		_password = password;
-		_ip = ip;
 		_port = port;
 		_address_family = address_family;
 		_type = type;
+		memset(_host, 0, NI_MAXHOST);
+		memset(_service, 0, NI_MAXSERV);
+		_ip = ip;
+		_password = password;
+		this->serverSocket = 0;
 	};
 
 Server::~Server() {
