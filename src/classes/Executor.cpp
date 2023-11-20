@@ -155,7 +155,6 @@ std::string	Executor::nextWord(std::string::size_type i, std::string content)
 
 	while (content[end] != ' ' && content[end] != 13 && content[end] != '\0')
 		end++;
-	std::cout << "------" << content.substr(start, end - start) << std::endl;
 	return (content.substr(start, end - start));
 }
 
