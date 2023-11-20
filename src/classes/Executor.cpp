@@ -133,19 +133,35 @@ void Executor::_join(std::string content) {
 			}
 		}
 		else {
-			chanToJoin->addUser(_userPtr, false);
 			std::string msg = RPL_JOIN(_userPtr->getNickname(), content);
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			msg = RPL_TOPIC(_userPtr, content, chanToJoin->getTopic());
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-			msg = RPL_NAMERPLY(_userPtr, (*chanToJoin), chanToJoin->getAllUsersForNameReply());
+			msg += RPL_NAMERPLY(_userPtr, (*chanToJoin), chanToJoin->getAllUsersForNameReply());
+			pr(msg);
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			msg = RPL_ENDOFNAMES(chanToJoin->getName());
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			// renvoyer la rpl a tout le monde
-			User *tmp = chanToJoin->getUserByNickname("mama2");
-			msg = RPL_JOIN(_userPtr->getNickname(), content);
-			send(tmp->getSocket(), msg.c_str(), msg.size(), 0);
+			char	*str;
+			std::string everyone = chanToJoin->getAllUsersForNameReply();
+			pr("AA");
+			str = strtok(const_cast<char *>(everyone.c_str()), " ");
+			while (str != NULL)
+			{
+				std::string name(str);
+				pr(name);
+				User *tmp;
+				if (str[0] == '@')
+					name = name.substr(1, name.length());
+				tmp = chanToJoin->getUserByNickname(name);
+				msg = RPL_JOIN(_userPtr->getNickname(), content);
+				pr("B");
+				send(tmp->getSocket(), msg.c_str(), msg.size(), 0);
+				pr("C");
+				str = strtok(0, " ");
+			}
+			chanToJoin->addUser(_userPtr, false);
 		}	
 	}
 }
@@ -172,7 +188,7 @@ void Executor::_createChannel(std::string content) {
 	_channels.push_back(newChan);
 	std::string msg = RPL_JOIN(_userPtr->getNickname(), content);
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-	msg = RPL_NAMERPLY(_userPtr, newChan, newChan.getNicknameWithPrefix(_userPtr));
+	msg = RPL_NAMERPLYCREATECHANNEL(_userPtr, newChan, newChan.getNicknameWithPrefix(_userPtr));
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	msg = RPL_ENDOFNAMES(newChan.getName());
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
