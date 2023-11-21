@@ -76,6 +76,8 @@ void Server::handle() {
 
 	struct sigaction sigStruct;
 	sigStruct.sa_handler = sigHandler;
+	sigemptyset(&sigStruct.sa_mask);
+	sigStruct.sa_flags = 0;
 	sigaction(SIGINT, &sigStruct, NULL);
 
 	_hintlen = sizeof(_hint);
@@ -96,8 +98,9 @@ void Server::handle() {
 		activity = select(FD_SETSIZE, &_readfds , NULL , NULL , NULL);
 		if (progOver)
 		{
-			std::cerr << "MMMM" << std::endl;
-			delete _executor;
+			for (std::vector<int>::iterator it = _client_socket.begin(); it != _client_socket.end(); it++)
+				if(*it)
+					close(*it);
 			throw sigintReceived();
 		}
 		if ((activity < 0) && (errno != EINTR))
