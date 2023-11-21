@@ -13,7 +13,7 @@ Executor::Executor(Server *ptr) {
 	this->_mapping["JOIN"] = &Executor::_join;
 	this->_mapping["PASS"] = &Executor::_pass;
 	this->_mapping["MODE"] = &Executor::_mode;
-	//this->_mapping["PRIVMSG"] = &Executor::_privmsg;
+	this->_mapping["PRIVMSG"] = &Executor::_privmsg;
 	return ;
 }
 
@@ -79,13 +79,13 @@ void Executor::_user(std::string content) {
 	if (_userPtr->checkPassword == false) {
 		_pass("");
 		return;
+	}
 	while (std::getline(iss, tmp, ' '))
 		params.push_back(tmp);
 	if (params.size() > 0)
 		this->_userPtr->setUsername(params[0]);
 	if (params.size() >= 4)
 		this->_userPtr->setRealname(params[3]);
-	}
 	std::string msg = RPL_WELCOME(_userPtr);
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
@@ -305,13 +305,60 @@ void Executor::_mode(std::string content)
 		}
 	}
 }
-  
+
+void Executor::_privmsg(std::string content) {
+	if (content[0] == '#')
+		_sendMessageToChan(content);
+	else
+		_sendPrivateMessage(content);
+}
+
+void Executor::_sendMessageToChan(std::string content) {
+	std::string chan, msg, reply;
+	chan = strtok(const_cast<char *>(content.c_str()), " ");
+	if (isChannel(chan)) {
+		msg = strtok(0, "");
+		msg = msg.substr(1, msg.size());
+		reply = RPL_PRIVMSG(_userPtr, chan, msg);
+		for (std::vector<int>::iterator it = _server->client_socket.begin(); it != _server->client_socket.end(); it++) {
+			if (*it && *it != _userPtr->getSocket())
+				send(*it, reply.c_str(), reply.size(), 0);
+		}
+	}
+	else {
+		msg = ERR_NOSUCHCHANNEL(_userPtr, chan);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
+
+void Executor::_sendPrivateMessage(std::string content) {
+	std::string msg, reply, nickToSend;
+	nickToSend = strtok(const_cast<char *>(content.c_str()), " ");
+	if (isUser(_userPtr)) {
+		msg = strtok(0, "");
+		msg = msg.substr(1, msg.size());
+		reply = RPL_PRIVMSG(_userPtr, nickToSend, msg);
+		send(getPrivateUserByNickname(nickToSend)->getSocket(), reply.c_str(), reply.size(), 0);
+		}
+	else {
+		msg = ERR_NOSUCHNICK(_userPtr, nickToSend);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
+
 Channel *Executor::getChannelByName(std::string channelName) {
 	for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); it++) {
 		if (it->getName() == channelName)
 			return &(*it);
 	}
 	return NULL;
+}
+
+bool Executor::isUser(User *user) {
+		for(std::vector<User>::iterator it = _server->users.begin(); it != _server->users.end(); it++)
+		if (user->getNickname() == (*it).getNickname())
+			return (true);
+	return (false);
 }
 
  /* GETTERS & SETTERS */
@@ -321,4 +368,14 @@ void Executor::setUserPtr(User *ptr) {
 
 User *Executor::getUserPtr() {
 	return _userPtr;
+}
+
+User *Executor::getPrivateUserByNickname(std::string nickName)
+{
+	for (std::vector<User>::iterator it = _server->users.begin(); it < _server->users.end(); it++) {
+		if ((*it).getNickname() == nickName)
+			return &(*it);
+	}
+
+	return (NULL);
 }

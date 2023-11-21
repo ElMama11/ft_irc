@@ -29,9 +29,7 @@ class Server {
 		void	_handleDisconnection(int i, int sd);
 
 		fd_set				_readfds;
-		std::vector<int>	_client_socket;
 		int					_hintlen;
-		std::vector<User>	_users;
 		Executor			*_executor;
 		int					_port;
 		int					_address_family;
@@ -57,6 +55,8 @@ class Server {
 		void		cleanAnUser(int userSocket);
 
 		int		serverSocket;
+		std::vector<int>	client_socket;
+		std::vector<User>	users;
 		
 		/* SETTERS & GETTERS */
 		void		setServerSocket(int servSock);

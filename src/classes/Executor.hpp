@@ -35,6 +35,8 @@ class Executor {
 		void _privmsg(std::string content);
 
 		void _createChannel(std::string content);
+		void _sendMessageToChan(std::string content);
+		void _sendPrivateMessage(std::string content);
 
 		mapFunc _mapping;
 		Server *_server;
@@ -51,6 +53,7 @@ class Executor {
 		Channel	*getChannelByName(std::string channelName);
 
 		bool isChannel(std::string channel);
+		bool isUser(User *user);
 		bool isHash(std::string content);
 		std::string	nextWord(std::string::size_type i, std::string content);
 		bool	isDigit(std::string content);
@@ -58,6 +61,7 @@ class Executor {
 		/* GETTERS & SETTERS*/
 		void setUserPtr(User *ptr);
 		User *getUserPtr();
+		User *getPrivateUserByNickname(std::string nickName);
 
 };
 
