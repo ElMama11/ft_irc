@@ -1,7 +1,9 @@
 #include "classes/Server.hpp"
+#include <signal.h>
+
+
 
 int main(int ac, char **av) {
-
 	if (ac != 3) {
 		std::cerr << "USAGE : ./ircserv <port> <password>" << std::endl;
 		exit(EXIT_FAILURE);

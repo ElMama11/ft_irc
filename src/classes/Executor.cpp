@@ -32,8 +32,8 @@ void Executor::execOPs(void) {
 		}
 		func f = _mapping[ops[i].type];
 		(this->*f)(ops[i].content);	
-		ops[i].type[0] = '\0';
-		ops[i].content[0] = '\0';
+		ops[i].type = "";
+		ops[i].content = "";
 	}
 }
 
@@ -145,7 +145,6 @@ void Executor::_join(std::string content) {
 			// renvoyer la rpl a tout le monde
 			char	*str;
 			std::string everyone = chanToJoin->getAllUsersForNameReply();
-			pr("AA");
 			str = strtok(const_cast<char *>(everyone.c_str()), " ");
 			while (str != NULL)
 			{
@@ -156,9 +155,7 @@ void Executor::_join(std::string content) {
 					name = name.substr(1, name.length());
 				tmp = chanToJoin->getUserByNickname(name);
 				msg = RPL_JOIN(_userPtr->getNickname(), content);
-				pr("B");
 				send(tmp->getSocket(), msg.c_str(), msg.size(), 0);
-				pr("C");
 				str = strtok(0, " ");
 			}
 			chanToJoin->addUser(_userPtr, false);

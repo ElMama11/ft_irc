@@ -1,4 +1,8 @@
 #include "Server.hpp"
+#include <signal.h>
+#include "../pr.cpp"
+
+bool progOver = false;
 
 Server::Server(const char *ip, int port, int address_family, int type, std::string password) {
 		std::cout << "Server constructor." << std::endl;
@@ -59,12 +63,27 @@ int Server::awaitForConnection() {
 	return clientSocket;
 }
 
+void sigHandler(int signal)
+{
+	if (signal == SIGINT)
+	{
+		progOver = true;
+		std::cerr << "over" << std::endl;
+	}
+}
+
 void Server::handle() {
+
+	struct sigaction sigStruct;
+	sigStruct.sa_handler = sigHandler;
+	sigaction(SIGINT, &sigStruct, NULL);
 
 	_hintlen = sizeof(_hint);
 	int i = 0, j = 0, activity = 0, valread = 0;
 	char tmpBuff[4096];
-	while (true) {
+	while (!progOver) {
+		if (progOver)
+			std::cerr << "MMMM" << std::endl;
 		//Clear buffer & socket set
 		memset(tmpBuff, 0, 4096);
 		FD_ZERO(&_readfds);
@@ -100,6 +119,8 @@ void Server::handle() {
 			}
 		}
 	}
+	if (progOver)
+			std::cerr << "KKKKKK" << std::endl;
 }
 
 
