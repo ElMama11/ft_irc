@@ -82,8 +82,6 @@ void Server::handle() {
 	int i = 0, j = 0, activity = 0, valread = 0;
 	char tmpBuff[4096];
 	while (!progOver) {
-		if (progOver)
-			std::cerr << "MMMM" << std::endl;
 		//Clear buffer & socket set
 		memset(tmpBuff, 0, 4096);
 		FD_ZERO(&_readfds);
@@ -96,6 +94,12 @@ void Server::handle() {
 		}
 		//wait for an activity on one of the sockets, timeout is NULL, so wait indefinitely  
 		activity = select(FD_SETSIZE, &_readfds , NULL , NULL , NULL);
+		if (progOver)
+		{
+			std::cerr << "MMMM" << std::endl;
+			delete _executor;
+			throw sigintReceived();
+		}
 		if ((activity < 0) && (errno != EINTR))
 			std::cerr << "Error: select()" << std::endl;
 		//If something happened on the master socket, then its an incoming connection else its some IO operation on some other socket 
@@ -119,8 +123,6 @@ void Server::handle() {
 			}
 		}
 	}
-	if (progOver)
-			std::cerr << "KKKKKK" << std::endl;
 }
 
 

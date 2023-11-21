@@ -112,6 +112,14 @@ class Server {
 					return ("Error: accept()");
 				}
 		};
+		class sigintReceived : public std::exception
+		{
+			public:
+				virtual const char *what() const throw()
+				{
+					return ("Program terminated");
+				}
+		};
 };
 
 #endif

@@ -17,9 +17,11 @@ int main(int ac, char **av) {
 	}
 	catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;
+		close(master_socket->serverSocket);
+		std::cerr << "qweqwe" << std::endl;
+		delete master_socket;
+		exit(EXIT_SUCCESS);
 	}
 
-	close(master_socket->serverSocket);
-	delete master_socket;
 	return 0;
 }
