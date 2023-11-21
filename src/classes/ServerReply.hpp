@@ -6,7 +6,7 @@
 
 #define RPL_INVITE_RCV(client, channelName, targetName) ":" + client.getNickname() + " INVITE " + targetName + " :" + channelName + "\n"
 #define RPL_JOIN(nickname, channelName) ":" + nickname + " JOIN :" + channelName + "\n"
-#define RPL_PRIVMSG(client, targetName, message) ":" + client.getNickname() + "!" + client.getUsername() + "@IRC PRIVMSG " + targetName + message + "\n"
+#define RPL_PRIVMSG(client, targetName, message) ":" + client->getNickname() + "!" + client->getUsername() + "@localhost PRIVMSG " + targetName + " :" + message + "\n"
 #define RPL_KICK(senderNick, channelName, targetNick, reason) ":" + senderNick + " KICK " + channelName + " " + targetNick + " " + reason + "\n"
 #define RPL_MODE(user, channelName, message) ":" + user.getNickname() + "!~" + user.getUsername() + "@" SERV_NAME " MODE " + channelName + " " + message + "\n"
 
@@ -25,11 +25,11 @@
 /* 353 */ #define RPL_NAMERPLY(client, channel, name) ":" SERV_NAME " 353 " + client->getNickname() + " @ " + channel.getName() + " :" + client->getNickname() + " " + name + "\n"
 /* 353 */ #define RPL_NAMERPLYCREATECHANNEL(client, channel, name) ":" SERV_NAME " 353 " + client->getNickname() + " @ " + channel.getName() + " :" + name + "\n"
 /* 366 */ #define RPL_ENDOFNAMES(channelName) ":" SERV_NAME " 366 " + channelName + " :End of /NAMES list." + "\n"
-/* 401 */ #define ERR_NOSUCHNICK(client, channelName, targetName) ":" SERV_NAME " 401 " + client.getNickname() + " " + channelName + " " + targetName + " :No such nick/channel" + "\n"
-/* 401 */ #define ERR_NOSUCHNICKCHAN(client, channelName, targetName, command) ":" + client.getNickname() + " PRIVMSG " + channelName + " :Error " + command + ": No such nick (" + targetName + ")" + "\n"
-/* 403 */ #define ERR_NOSUCHCHANNEL(client, channelName) ":" SERV_NAME " 403 " + client.getNickname() + " " + channelName + " :No such channel" + "\n"
+/* 401 */ #define ERR_NOSUCHNICK(client, targetName) ":" SERV_NAME " 401 " + client->getNickname() + " " + targetName + " :No such nick/channel" + "\n"
+/* 401 */ #define ERR_NOSUCHNICKCHAN(client, channelName, targetName, command) ":" + client->getNickname() + " PRIVMSG " + channelName + " :Error " + command + ": No such nick (" + targetName + ")" + "\n"
+/* 403 */ #define ERR_NOSUCHCHANNEL(client, channelName) ":" SERV_NAME " 403 " + client->getNickname() + " " + channelName + " :No such channel" + "\n"
 
-/* 404 */ #define ERR_CANNOTSENDTOCHAN(client, channelName) ":" SERV_NAME " 404 " + client.getNickname() + " " + channelName + " :Cannot send to channel" + "\n"
+/* 404 */ #define ERR_CANNOTSENDTOCHAN(client, channelName) ":" SERV_NAME " 404 " + client->getNickname() + " " + channelName + " :Cannot send to channel" + "\n"
 
 /* 403 */ #define ERR_INVALIDCHANNEL(client, channelName) ":" SERV_NAME " 403 " + client->getNickname() + " " + channelName + " :Invalid channel name" + "\n"
 /* 416 */ #define ERR_TOOMANYMATCHES(client) ":" SERV_NAME " 416 " + client.getNickname() + " :Command or message too long" + "\n"

@@ -93,16 +93,16 @@ void Server::handle() {
 		FD_ZERO(&_readfds);
 		FD_SET(this->serverSocket, &_readfds);
 		//add child sockets to set
-		for (i = 0; i < _client_socket.size(); i++) {   
+		for (i = 0; i < client_socket.size(); i++) {   
 			//if valid socket descriptor then add to read list
-			if(_client_socket[i] > 0)
-				FD_SET(_client_socket[i] , &_readfds);
+			if(client_socket[i] > 0)
+				FD_SET(client_socket[i] , &_readfds);
 		}
 		//wait for an activity on one of the sockets, timeout is NULL, so wait indefinitely  
 		activity = select(FD_SETSIZE, &_readfds , NULL , NULL , NULL);
 		if (progOver)
 		{
-			for (std::vector<int>::iterator it = _client_socket.begin(); it != _client_socket.end(); it++)
+			for (std::vector<int>::iterator it = client_socket.begin(); it != client_socket.end(); it++)
 				if(*it)
 					close(*it);
 			throw sigintReceived();
@@ -111,12 +111,12 @@ void Server::handle() {
 			std::cerr << "Error: select()" << std::endl;
 		//If something happened on the master socket, then its an incoming connection else its some IO operation on some other socket 
 		_acceptIncomingConnection();
-		for (i = 0; i < _client_socket.size(); i++) {
-			_executor->setUserPtr(getUserBySocket(_client_socket[i]));
-			if (FD_ISSET(_client_socket[i] , &_readfds)) {
+		for (i = 0; i < client_socket.size(); i++) {
+			_executor->setUserPtr(getUserBySocket(client_socket[i]));
+			if (FD_ISSET(client_socket[i] , &_readfds)) {
 				//Check if it was for closing , and also read the incoming message  
-				if ((valread = recv(_client_socket[i] , tmpBuff, 4096, 0)) == 0)
-					_handleDisconnection(i, _client_socket[i]);
+				if ((valread = recv(client_socket[i] , tmpBuff, 4096, 0)) == 0)
+					_handleDisconnection(i, client_socket[i]);
 				else {
 					for (j = 0; _executor->getUserPtr()->buffer[j] != '\0'; j++);
 					strcpy(_executor->getUserPtr()->buffer + j, tmpBuff);
@@ -137,16 +137,16 @@ void Server::errorMsg(std::string reason, int clientSocket) {
 	std::string msg = "ERROR: ";
 	msg += reason;
 	send(clientSocket, msg.c_str(), msg.size(), 0);
-	for (std::vector<int>::iterator it = _client_socket.begin(); it != _client_socket.end(); it++)
+	for (std::vector<int>::iterator it = client_socket.begin(); it != client_socket.end(); it++)
 	{
 		if ((*it) == clientSocket) {
-			_client_socket.erase(it);
+			client_socket.erase(it);
 			break;
 		}
 	}
-	for (std::vector<User>::iterator ite = _users.begin(); ite != _users.end(); ite++) {
+	for (std::vector<User>::iterator ite = users.begin(); ite != users.end(); ite++) {
 		if((*ite).getSocket() == clientSocket) {
-			_users.erase(ite);
+			users.erase(ite);
 			break;
 		}
 	}
@@ -154,15 +154,15 @@ void Server::errorMsg(std::string reason, int clientSocket) {
 }
 
 void Server::cleanAnUser(int userSocket) {
-	for (std::vector<int>::iterator it = _client_socket.begin(); it != _client_socket.end(); it++) {
+	for (std::vector<int>::iterator it = client_socket.begin(); it != client_socket.end(); it++) {
 		if ((*it) == userSocket) {
-			_client_socket.erase(it);
+			client_socket.erase(it);
 			break;
 		}
 	}
-	for (std::vector<User>::iterator it = _users.begin(); it != _users.end(); it++) {
+	for (std::vector<User>::iterator it = users.begin(); it != users.end(); it++) {
 		if ((*it).getSocket() == userSocket) {
-			_users.erase(it);
+			users.erase(it);
 			break;
 		}
 	}
@@ -192,10 +192,10 @@ void Server::_acceptIncomingConnection() {
 		if ((new_socket = accept(this->serverSocket, (struct sockaddr *)&_hint, (socklen_t*)&_hintlen)) < 0) 
 			throw acceptSocketError();
 		printf("New connection, socket fd is %d, ip is : %s, port : %d \n", new_socket, inet_ntoa(_hint.sin_addr), ntohs(_hint.sin_port));
-		_client_socket.push_back(new_socket);
+		client_socket.push_back(new_socket);
 		User tmp(new_socket);
-		_users.push_back(tmp);
-		std::cout << "Adding to list of sockets as " << _client_socket.size() -1 << std::endl << std::endl;
+		users.push_back(tmp);
+		std::cout << "Adding to list of sockets as " << client_socket.size() -1 << std::endl << std::endl;
 	}
 }
 
@@ -204,8 +204,8 @@ void Server::_handleDisconnection(int i, int sd) {
 	printf("Host disconnected, ip %s, port %d \n", inet_ntoa(_hint.sin_addr), ntohs(_hint.sin_port));   
 	//Close the socket and mark as 0 in list for reuse  
 	close(sd);
-	_client_socket.erase(_client_socket.begin() + i);
-	_users.erase(_users.begin() + i);
+	client_socket.erase(client_socket.begin() + i);
+	users.erase(users.begin() + i);
 }
 
 /* GETTERS & SETTERS */
@@ -216,7 +216,7 @@ void Server::setServerSocket(int servSock) {
 
 User *Server::getUserBySocket(int socket) {
 	
-	for (std::vector<User>::iterator it = _users.begin(); it < _users.end(); it++) {
+	for (std::vector<User>::iterator it = users.begin(); it < users.end(); it++) {
 		if ((*it).getSocket() == socket)
 			return &(*it);
 	}
@@ -225,7 +225,7 @@ User *Server::getUserBySocket(int socket) {
 
 User *Server::getUserByUsername(std::string username) {
 	
-	for (std::vector<User>::iterator it = _users.begin(); it < _users.end(); it++) {
+	for (std::vector<User>::iterator it = users.begin(); it < users.end(); it++) {
 		if ((*it).getUsername() == username)
 			return &(*it);
 	}
