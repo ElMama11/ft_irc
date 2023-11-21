@@ -32,8 +32,8 @@ void Executor::execOPs(void) {
 		}
 		func f = _mapping[ops[i].type];
 		(this->*f)(ops[i].content);	
-		ops[i].type[0] = '\0';
-		ops[i].content[0] = '\0';
+		ops[i].type = "";
+		ops[i].content = "";
 	}
 }
 

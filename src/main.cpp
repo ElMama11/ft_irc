@@ -1,7 +1,9 @@
 #include "classes/Server.hpp"
+#include <signal.h>
+
+
 
 int main(int ac, char **av) {
-
 	if (ac != 3) {
 		std::cerr << "USAGE : ./ircserv <port> <password>" << std::endl;
 		exit(EXIT_FAILURE);
@@ -15,9 +17,9 @@ int main(int ac, char **av) {
 	}
 	catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;
+		close(master_socket->serverSocket);
 	}
 
-	close(master_socket->serverSocket);
 	delete master_socket;
 	return 0;
 }
