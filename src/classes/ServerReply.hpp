@@ -48,10 +48,10 @@
 
 /* 464 */ #define ERR_PASSWDMISMATCH(client) ":" SERV_NAME " 464 " + client->getNickname() + " :Password Incorrect" + "\n"
 
-/* 471 */ #define ERR_CHANNELISFULL(client, channelName) ":" SERV_NAME " 471 " + client.getNickname() + " " + channelName + " :Cannot join channel (+l) - channel is full, try again later" + "\n"
+/* 471 */ #define ERR_CHANNELISFULL(client, channelName) ":" SERV_NAME " 471 " + client->getNickname() + " " + channelName + " :Cannot join channel (+l) - channel is full, try again later" + "\n"
 /* 472 */ #define ERR_UNKNOWNMODE(client, channelName, char) ":" SERV_NAME " 472 " + client.getNickname() + " " + channelName + " " + char + " :is unknown mode char to me for me" + "\n"
-/* 473 */ #define ERR_INVITEONLYCHAN(client, channelName) ":" SERV_NAME " 473 " + client.getNickname() + " " + channelName + " :Cannot join channel (+i) - you must be invited" + "\n"
-/* 475 */ #define ERR_BADCHANNELKEY(client, channelName) ":" SERV_NAME " 475 " + client.getNickname() + " " + channelName + " :Cannot join channel (+k) - bad key" + "\n"
+/* 473 */ #define ERR_INVITEONLYCHAN(client, channelName) ":" SERV_NAME " 473 " + client->getNickname() + " " + channelName + " :Cannot join channel (+i) - you must be invited" + "\n"
+/* 475 */ #define ERR_BADCHANNELKEY(client, channelName) ":" SERV_NAME " 475 " + client->getNickname() + " " + channelName + " :Cannot join channel (+k) - bad key" + "\n"
 /* 476 */ #define ERR_BADCHANNELMASK(channelName) ":" SERV_NAME " 476 " + channelName + " :Bad Channel Mask" + "\n"
 /* 476 */ #define ERR_BADLIMIT(client, channelName, input) ":" SERV_NAME " 476 " + client.getNickname() + " " + channelName + " :Bad limit input (" + input + ")." + "\n"
 /* 482 */ #define ERR_CHANOPRIVSNEEDED(client, channelName) ":" SERV_NAME " 482 " + client.getNickname() + " " + channelName + " :You're not channel operator" + "\n"

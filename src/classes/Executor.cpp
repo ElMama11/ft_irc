@@ -68,7 +68,12 @@ void Executor::_nick(std::string content) {
 }
 
 void Executor::_quit(std::string content) {
-	std::cout << "func _quit: USER SOCKET: " << this->_userPtr->getSocket() << std::endl;
+	std::string msg = "ERROR :Closing Link: ";
+	msg += _userPtr->getNickname();
+	msg += " (Quit: ";
+	msg += _userPtr->getNickname();
+	msg += ")\n";
+	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
 
 void Executor::_user(std::string content) {
@@ -108,15 +113,18 @@ void Executor::_join(std::string content) {
 	else {
 		Channel *chanToJoin = getChannelByName(content);
 		if (chanToJoin == NULL) {
-			std::cout << "ERROR CHANNEL DONT EXIST" << std::endl;
+			msg = ERR_NOSUCHCHANNEL(_userPtr, content);
+			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			return;
 		}
 		else if (chanToJoin->countUsersInChannel() >= chanToJoin->getUserLimits()) {
-			std::cout << "PU DE PLACE" << std::endl;
+			msg = ERR_CHANNELISFULL(_userPtr, content);
+			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			return;
 		}
 		else if (chanToJoin->getInviteOnly() == true && _userPtr->isInvited(content) == false) {
-			std::cout << "LE CHAN EST EN INVIT ONLY" << std::endl;
+			msg = ERR_INVITEONLYCHAN(_userPtr, content);
+			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			return;
 		}
 		else if (chanToJoin->getPass() != "") {
@@ -128,7 +136,8 @@ void Executor::_join(std::string content) {
 				end++; 
 			std::string userPass = content.substr(start, end - start);
 			if (userPass != chanToJoin->getPass()) {
-				std::cout << "NEED un mdp" << std::endl;
+				msg = ERR_BADCHANNELKEY(_userPtr, content);
+				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 				return;
 			}
 		}
@@ -141,7 +150,7 @@ void Executor::_join(std::string content) {
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			msg = RPL_ENDOFNAMES(chanToJoin->getName());
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-			// renvoyer la rpl a tout le monde
+			// Resend message to all users in the channel
 			char	*str;
 			std::string everyone = chanToJoin->getAllUsersForNameReply();
 			str = strtok(const_cast<char *>(everyone.c_str()), " ");
