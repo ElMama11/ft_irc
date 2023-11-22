@@ -14,6 +14,7 @@ Executor::Executor(Server *ptr) {
 	this->_mapping["PASS"] = &Executor::_pass;
 	this->_mapping["MODE"] = &Executor::_mode;
 	this->_mapping["PRIVMSG"] = &Executor::_privmsg;
+	this->_mapping["KICK"] = &Executor::_kick;
 	return ;
 }
 
@@ -353,6 +354,42 @@ void Executor::_sendPrivateMessage(std::string content) {
 		msg = ERR_NOSUCHNICK(_userPtr, nickToSend);
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	}
+}
+
+void Executor::_kick(std::string content) {
+	std::string chanName, reason, nickToKick, msg;
+	Channel *chan;
+	int i = -1, j = 0, count = 0;
+	while (content[++i])
+		if (content[i] == ' ')
+			j++;
+	if (j < 2) {
+		msg = ERR_NEEDMOREPARAMS(_userPtr, "KICK");
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	strtok(const_cast<char *>(content.c_str()), " ");
+	chanName = strtok(0, " ");
+	if (chan->isOp(_userPtr) == false) {
+		msg = ERR_CHANOPRIVSNEEDED(_userPtr, chanName);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	if (isChannel(chanName) == false) {
+		msg = ERR_NOSUCHCHANNEL(_userPtr, chanName);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	chan = getChannelByName(chanName);
+	nickToKick = strtok(0, " ");
+	if (chan->isOpByNickname(nickToKick) == false && chan->isUserByNickname(nickToKick) == false) {
+		msg = ERR_NOSUCHNICK(_userPtr, nickToKick);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	if (strtok(0, " ") != NULL)
+		reason = 
+	
 }
 
 Channel *Executor::getChannelByName(std::string channelName) {

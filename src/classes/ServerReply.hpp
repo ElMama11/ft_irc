@@ -42,7 +42,7 @@
 /* 443 */ #define ERR_USERONCHANNEL(targetName, channelName) ":" SERV_NAME " 443 " + targetName + " " + channelName + " :is already on channel" + "\n"
 /* 451 */ #define ERR_NOTREGISTERED(client) ":" SERV_NAME " 451 " + client.getNickname() + " :You have not registered" + "\n"
 /* 451 */ #define ERR_NOTREGISTERED_MSG(client, message) ":" SERV_NAME " 451 " + client.getNickname() + " :" + message + "\n"
-/* 461 */ #define ERR_NEEDMOREPARAMS(client, command) ":" SERV_NAME " 461 " + client-> + " " + command + " :Not enough parameters" + "\n"
+/* 461 */ #define ERR_NEEDMOREPARAMS(client, command) ":" SERV_NAME " 461 " + client->getNickname() + " " + command + " :Not enough parameters" + "\n"
 /* 462 */ #define ERR_TOOMANYPARAMS(command) ":" SERV_NAME " 462 " + command + " :Too many parameters" + "\n"
 /* 463 */ #define ERR_ALREADYREGISTRED(clientName) ":" SERV_NAME " 463 " + clientName + " :Already registered" + "\n"
 
@@ -54,7 +54,7 @@
 /* 475 */ #define ERR_BADCHANNELKEY(client, channelName) ":" SERV_NAME " 475 " + client->getNickname() + " " + channelName + " :Cannot join channel (+k) - bad key" + "\n"
 /* 476 */ #define ERR_BADCHANNELMASK(channelName) ":" SERV_NAME " 476 " + channelName + " :Bad Channel Mask" + "\n"
 /* 476 */ #define ERR_BADLIMIT(client, channelName, input) ":" SERV_NAME " 476 " + client.getNickname() + " " + channelName + " :Bad limit input (" + input + ")." + "\n"
-/* 482 */ #define ERR_CHANOPRIVSNEEDED(client, channelName) ":" SERV_NAME " 482 " + client.getNickname() + " " + channelName + " :You're not channel operator" + "\n"
+/* 482 */ #define ERR_CHANOPRIVSNEEDED(client, channelName) ":" SERV_NAME " 482 " + client->getNickname() + " " + channelName + " :You're not channel operator" + "\n"
 
 // # define RPL_WELCOME(user)  user + std::string(" Welcome to the ") SERV_NAME std::string(" Network, ") + user + "\n"
 // # define RPL_YOURHOST       std::string("Your host is ") SERV_NAME std::string(", running version ") + SERV_VERSION + "\n"

@@ -50,6 +50,7 @@ class	Channel
 		std::string		getNicknameWithPrefix(User *user);
 		bool			isOp(User *user);
 		bool			isUserByNickname(std::string nickname);
+		bool			isOpByNickname(std::string nickname);
 
 };
 
