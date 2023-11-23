@@ -95,6 +95,34 @@ void Executor::_user(std::string content) {
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
 
+void	Executor::joinChannel(std::string firstword, Channel *chanToJoin)
+{
+	std::string msg = RPL_JOIN(_userPtr->getNickname(), firstword);
+	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	msg = RPL_TOPIC(_userPtr, firstword, chanToJoin->getTopic());
+	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	msg += RPL_NAMERPLY(_userPtr, (*chanToJoin), chanToJoin->getAllUsersForNameReply());
+	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	msg = RPL_ENDOFNAMES(chanToJoin->getName());
+	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	// Resend message to all users in the channel
+	char	*str;
+	std::string everyone = chanToJoin->getAllUsersForNameReply();
+	str = strtok(const_cast<char *>(everyone.c_str()), " ");
+	while (str != NULL)
+	{
+		std::string name(str);
+		User *tmp;
+		if (str[0] == '@')
+			name = name.substr(1, name.length());
+		tmp = chanToJoin->getUserByNickname(name);
+		msg = RPL_JOIN(_userPtr->getNickname(), firstword);
+		send(tmp->getSocket(), msg.c_str(), msg.size(), 0);
+		str = strtok(0, " ");
+	}
+	chanToJoin->addUser(_userPtr, false);
+}
+
 void Executor::_join(std::string content) {
 	std::string msg;
 
@@ -103,27 +131,27 @@ void Executor::_join(std::string content) {
 	iss >> firstword;
 
 	if (firstword.find('#') == -1 || firstword == "#") {
-		msg = ERR_INVALIDCHANNEL(_userPtr, content);
+		msg = ERR_INVALIDCHANNEL(_userPtr, firstword);
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 		return ;
 	}
-	if (!isChannel(content)) {
-		_createChannel(content);
+	if (!isChannel(firstword)) {
+		_createChannel(firstword);
 	}
 	else {
-		Channel *chanToJoin = getChannelByName(content);
+		Channel *chanToJoin = getChannelByName(firstword);
 		if (chanToJoin == NULL) {
-			msg = ERR_NOSUCHCHANNEL(_userPtr, content);
+			msg = ERR_NOSUCHCHANNEL(_userPtr, firstword);
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			return;
 		}
 		else if (chanToJoin->countUsersInChannel() >= chanToJoin->getUserLimits()) {
-			msg = ERR_CHANNELISFULL(_userPtr, content);
+			msg = ERR_CHANNELISFULL(_userPtr, firstword);
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			return;
 		}
 		else if (chanToJoin->getInviteOnly() == true && _userPtr->isInvited(content) == false) {
-			msg = ERR_INVITEONLYCHAN(_userPtr, content);
+			msg = ERR_INVITEONLYCHAN(_userPtr, firstword);
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			return;
 		}
@@ -140,33 +168,11 @@ void Executor::_join(std::string content) {
 				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 				return;
 			}
-		}
-		else {
-			std::string msg = RPL_JOIN(_userPtr->getNickname(), content);
-			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-			msg = RPL_TOPIC(_userPtr, content, chanToJoin->getTopic());
-			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-			msg += RPL_NAMERPLY(_userPtr, (*chanToJoin), chanToJoin->getAllUsersForNameReply());
-			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-			msg = RPL_ENDOFNAMES(chanToJoin->getName());
-			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-			// Resend message to all users in the channel
-			char	*str;
-			std::string everyone = chanToJoin->getAllUsersForNameReply();
-			str = strtok(const_cast<char *>(everyone.c_str()), " ");
-			while (str != NULL)
-			{
-				std::string name(str);
-				User *tmp;
-				if (str[0] == '@')
-					name = name.substr(1, name.length());
-				tmp = chanToJoin->getUserByNickname(name);
-				msg = RPL_JOIN(_userPtr->getNickname(), content);
-				send(tmp->getSocket(), msg.c_str(), msg.size(), 0);
-				str = strtok(0, " ");
-			}
-			chanToJoin->addUser(_userPtr, false);
-		}	
+			else
+				joinChannel(firstword, chanToJoin);	
+		}	//	JOIN WITH GOOD PASSWORD
+		else
+			joinChannel(firstword, chanToJoin);	
 	}
 }
 

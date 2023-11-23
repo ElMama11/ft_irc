@@ -63,6 +63,9 @@ class Executor {
 		User *getUserPtr();
 		User *getPrivateUserByNickname(std::string nickName);
 
+		void	joinChannel(std::string firstword, Channel *chanToJoin);
+
+
 };
 
 #endif
