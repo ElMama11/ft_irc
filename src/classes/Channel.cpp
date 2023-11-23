@@ -314,3 +314,15 @@ void Channel::sendKickReplyToAll(std::string chanName, std::string reason, std::
 		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }
+
+void Channel::sendTopicReplyToAll(std::string chanName, std::string topic, Channel *chan) {
+	std::string msg;
+	for (std::vector<User *>::iterator it = chan->_op.begin(); it != chan->_op.end(); it++) {
+		msg = RPL_TOPIC((*it), chanName, topic);
+		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
+	}
+	for (std::vector<User *>::iterator it = chan->_user.begin(); it != chan->_user.end(); it++) {
+		msg = RPL_TOPIC((*it), chanName, topic);
+		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
