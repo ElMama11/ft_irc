@@ -103,7 +103,7 @@ void	Executor::joinChannel(std::string firstword, Channel *chanToJoin)
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	msg = RPL_TOPIC(_userPtr, firstword, chanToJoin->getTopic());
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-	msg += RPL_NAMERPLY(_userPtr, (*chanToJoin), chanToJoin->getAllUsersForNameReply());
+	msg = RPL_NAMERPLY(_userPtr, (*chanToJoin), chanToJoin->getAllUsersForNameReply());
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	msg = RPL_ENDOFNAMES(chanToJoin->getName());
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
