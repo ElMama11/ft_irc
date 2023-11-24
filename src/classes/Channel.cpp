@@ -130,10 +130,13 @@ void	Channel::delUser(User *user)
 	}
 
 	it = _user.begin();
-	while (it != _user.begin())
+	while (it != _user.end())
 	{
 		if ((*it)->getSocket() == user->getSocket())
+		{
 			_user.erase(it);
+			break ;
+		}
 		it++;
 	}
 }
@@ -276,6 +279,14 @@ bool		Channel::isUserByNickname(std::string nickname)
 	return (false);
 }
 
+bool		Channel::isOpByNickname(std::string nickname)
+{
+	for (std::vector<User *>::iterator it = _op.begin(); it != _op.end(); it++)
+		if (nickname != (*it)->getNickname())
+			return (true);
+	return (false);
+}
+
 std::string		Channel::getAllUsersForNameReply()
 {
 	std::string names;
@@ -290,4 +301,28 @@ std::string		Channel::getAllUsersForNameReply()
 		names += " ";
 	}
 	return names;
+}
+
+void Channel::sendKickReplyToAll(std::string chanName, std::string reason, std::string nickToKick, Channel *chan) {
+	std::string msg;
+	for (std::vector<User *>::iterator it = chan->_op.begin(); it != chan->_op.end(); it++) {
+		msg = RPL_KICK((*it)->getNickname(), chanName, nickToKick, reason);
+		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
+	}
+	for (std::vector<User *>::iterator it = chan->_user.begin(); it != chan->_user.end(); it++) {
+		msg = RPL_KICK((*it)->getNickname(), chanName, nickToKick, reason);
+		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
+
+void Channel::sendTopicReplyToAll(std::string chanName, std::string topic, Channel *chan) {
+	std::string msg;
+	for (std::vector<User *>::iterator it = chan->_op.begin(); it != chan->_op.end(); it++) {
+		msg = RPL_TOPIC((*it), chanName, topic);
+		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
+	}
+	for (std::vector<User *>::iterator it = chan->_user.begin(); it != chan->_user.end(); it++) {
+		msg = RPL_TOPIC((*it), chanName, topic);
+		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
+	}
 }

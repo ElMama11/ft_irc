@@ -33,6 +33,8 @@ class Executor {
 		void _pass(std::string content);
 		void _mode(std::string content);
 		void _privmsg(std::string content);
+		void _kick(std::string content);
+		void _topic(std::string content);
 
 		void _createChannel(std::string content);
 		void _sendMessageToChan(std::string content);
