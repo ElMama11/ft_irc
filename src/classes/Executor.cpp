@@ -441,7 +441,7 @@ Channel *Executor::getChannelByName(std::string channelName) {
 }
 
 bool Executor::isUser(User *user) {
-		for(std::vector<User>::iterator it = _server->users.begin(); it != _server->users.end(); it++)
+		for(std::list<User>::iterator it = _server->users.begin(); it != _server->users.end(); it++)
 		if (user->getNickname() == (*it).getNickname())
 			return (true);
 	return (false);
@@ -458,7 +458,7 @@ User *Executor::getUserPtr() {
 
 User *Executor::getPrivateUserByNickname(std::string nickName)
 {
-	for (std::vector<User>::iterator it = _server->users.begin(); it < _server->users.end(); it++) {
+	for (std::list<User>::iterator it = _server->users.begin(); it != _server->users.end(); it++) {
 		if ((*it).getNickname() == nickName)
 			return &(*it);
 	}
