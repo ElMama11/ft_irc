@@ -70,6 +70,8 @@ void Executor::_nick(std::string content) {
 }
 
 void Executor::_quit(std::string content) {
+
+	bool endOfChannel = false;
 	std::string msg = ":";
 	msg += _userPtr->getNickname();
 	msg += " QUIT :Connection closed\n";
@@ -82,6 +84,20 @@ void Executor::_quit(std::string content) {
 			(*it).sendQuitReplyToAll(msg);
 			(*it).delUser(_userPtr);
 		}
+	}
+	std::vector<Channel>::iterator start = _channels.begin();
+	std::vector<Channel>::iterator end = _channels.begin();
+
+	if (start != _channels.end())
+		start++;
+	while (end != _channels.end()) {
+		if ((*end).isUserLeft() == true)
+		{
+			_channels.erase(end);
+		}
+		end = start;
+		if (start != _channels.end())
+			start++;
 	}
 }
 
