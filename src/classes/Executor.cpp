@@ -31,7 +31,7 @@ void Executor::execOPs(void) {
 			msg = ERR_UNKNOWNCOMMAND(_userPtr, ops[i].type);
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			break;
-		}.tmp
+		}
 		func f = _mapping[ops[i].type];
 		(this->*f)(ops[i].content);	
 		ops[i].type = "";

@@ -70,10 +70,7 @@ int Server::awaitForConnection() {
 void sigHandler(int signal)
 {
 	if (signal == SIGINT)
-	{
 		progOver = true;
-		std::cerr << "over" << std::endl;
-	}
 }
 
 void Server::handle() {
@@ -191,21 +188,12 @@ void Server::_acceptIncomingConnection() {
 	if (FD_ISSET(this->serverSocket, &_readfds)) {
 		if ((new_socket = accept(this->serverSocket, (struct sockaddr *)&_hint, (socklen_t*)&_hintlen)) < 0)
 		{
-			pr("asdasd");
 			throw acceptSocketError();
 		}
 		printf("New connection, socket fd is %d, ip is : %s, port : %d \n", new_socket, inet_ntoa(_hint.sin_addr), ntohs(_hint.sin_port));
 		client_socket.push_back(new_socket);
-		for (std::vector<int>::iterator it = client_socket.begin(); it != client_socket.end(); it++)
-			pr("A", *it);
-		for (std::vector<User>::iterator it = users.begin(); it != users.end(); it++)
-			pr("B", (*it).getNickname());
 		User tmp(new_socket);
 		users.push_back(tmp);
-		for (std::vector<int>::iterator it = client_socket.begin(); it != client_socket.end(); it++)
-			pr("C", *it);
-		for (std::vector<User>::iterator it = users.begin(); it != users.end(); it++)
-			pr("D", (*it).getNickname());
 		std::cout << "Adding to list of sockets as " << client_socket.size() -1 << std::endl << std::endl;
 	}
 }
