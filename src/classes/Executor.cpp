@@ -387,7 +387,7 @@ User *Executor::getUserPtr() {
 
 User *Executor::getPrivateUserByNickname(std::string nickName)
 {
-	for (std::vector<User>::iterator it = _server->users.begin(); it < _server->users.end(); it++) {
+	for (std::vector<User>::iterator it = _server->users.begin(); it != _server->users.end(); it++) {
 		if ((*it).getNickname() == nickName)
 			return &(*it);
 	}
