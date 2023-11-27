@@ -70,12 +70,19 @@ void Executor::_nick(std::string content) {
 }
 
 void Executor::_quit(std::string content) {
-	std::string msg = "ERROR :Closing Link: ";
+	std::string msg = ":";
 	msg += _userPtr->getNickname();
-	msg += " (Quit: ";
-	msg += _userPtr->getNickname();
-	msg += ")\n";
-	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	msg += " QUIT :Connection closed\n";
+    for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); it++) {
+		if ((*it).isUserByNickname(_userPtr->getNickname()) == true) {
+			(*it).sendQuitReplyToAll(msg);
+			(*it).delUser(_userPtr);
+		}
+		else if ((*it).isOpByNickname(_userPtr->getNickname()) == true) {
+			(*it).sendQuitReplyToAll(msg);
+			(*it).delUser(_userPtr);
+		}
+	}
 }
 
 void Executor::_user(std::string content) {

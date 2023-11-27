@@ -274,7 +274,7 @@ std::string	Channel::getNicknameWithPrefix(User *user)
 bool		Channel::isUserByNickname(std::string nickname)
 {
 	for (std::vector<User *>::iterator it = _user.begin(); it != _user.end(); it++)
-		if (nickname != (*it)->getNickname())
+		if (nickname == (*it)->getNickname())
 			return (true);
 	return (false);
 }
@@ -282,10 +282,10 @@ bool		Channel::isUserByNickname(std::string nickname)
 bool		Channel::isOpByNickname(std::string nickname)
 {
 	for (std::vector<User *>::iterator it = _op.begin(); it != _op.end(); it++)
-		if (nickname != (*it)->getNickname())
+		if (nickname == (*it)->getNickname())
 			return (true);
 	return (false);
-}
+ }
 
 std::string		Channel::getAllUsersForNameReply()
 {
@@ -323,6 +323,15 @@ void Channel::sendTopicReplyToAll(std::string chanName, std::string topic, Chann
 	}
 	for (std::vector<User *>::iterator it = chan->_user.begin(); it != chan->_user.end(); it++) {
 		msg = RPL_TOPIC((*it), chanName, topic);
+		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
+void Channel::sendQuitReplyToAll(std::string msg) {
+
+	for (std::vector<User *>::iterator it = _op.begin(); it != _op.end(); it++) {
+		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
+	}
+	for (std::vector<User *>::iterator it = _user.begin(); it != _user.end(); it++) {
 		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }

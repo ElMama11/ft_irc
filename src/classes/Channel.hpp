@@ -51,11 +51,13 @@ class	Channel
 		std::string		getAllUsersForNameReply();
 		void			sendKickReplyToAll(std::string chanName, std::string reason, std::string nickToKick, Channel *chan);
 		void			sendTopicReplyToAll(std::string chanName, std::string topic, Channel *chan);
+		void			sendQuitReplyToAll(std::string msg);
 
 		std::string		getNicknameWithPrefix(User *user);
 		bool			isOp(User *user);
 		bool			isUserByNickname(std::string nickname);
 		bool			isOpByNickname(std::string nickname);
+		bool			isUserAndOpByNickname(std::string nickname);
 
 };
 

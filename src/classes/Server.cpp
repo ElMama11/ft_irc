@@ -205,7 +205,11 @@ void Server::_handleDisconnection(int i, int sd) {
 	//Close the socket and mark as 0 in list for reuse  
 	close(sd);
 	client_socket.erase(client_socket.begin() + i);
-	//users.erase(users.begin() + i);
+	for (std::list<User>::iterator it = users.begin(); it != users.end(); it++)
+		if ((*it).getSocket() == sd) {
+			users.erase(it);
+			break;
+		}
 }
 
 /* GETTERS & SETTERS */
