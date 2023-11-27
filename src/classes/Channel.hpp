@@ -1,7 +1,10 @@
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 
-#include "User.hpp"
+# include "User.hpp"
+# include <sys/types.h>
+# include <sys/socket.h>
+# include "ServerReply.hpp"
 
 class	Channel
 {
@@ -46,10 +49,13 @@ class	Channel
 		User			*getUserByUsername(std::string userName);
 		unsigned int	totalUser(void);
 		std::string		getAllUsersForNameReply();
+		void			sendKickReplyToAll(std::string chanName, std::string reason, std::string nickToKick, Channel *chan);
+		void			sendTopicReplyToAll(std::string chanName, std::string topic, Channel *chan);
 
 		std::string		getNicknameWithPrefix(User *user);
 		bool			isOp(User *user);
 		bool			isUserByNickname(std::string nickname);
+		bool			isOpByNickname(std::string nickname);
 
 };
 

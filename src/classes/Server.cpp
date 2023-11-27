@@ -144,7 +144,7 @@ void Server::errorMsg(std::string reason, int clientSocket) {
 			break;
 		}
 	}
-	for (std::vector<User>::iterator ite = users.begin(); ite != users.end(); ite++) {
+	for (std::list<User>::iterator ite = users.begin(); ite != users.end(); ite++) {
 		if((*ite).getSocket() == clientSocket) {
 			users.erase(ite);
 			break;
@@ -160,7 +160,7 @@ void Server::cleanAnUser(int userSocket) {
 			break;
 		}
 	}
-	for (std::vector<User>::iterator it = users.begin(); it != users.end(); it++) {
+	for (std::list<User>::iterator it = users.begin(); it != users.end(); it++) {
 		if ((*it).getSocket() == userSocket) {
 			users.erase(it);
 			break;
@@ -216,7 +216,7 @@ void Server::_handleDisconnection(int i, int sd) {
 	//Close the socket and mark as 0 in list for reuse  
 	close(sd);
 	client_socket.erase(client_socket.begin() + i);
-	users.erase(users.begin() + i);
+	//users.erase(users.begin() + i);
 }
 
 /* GETTERS & SETTERS */
@@ -227,7 +227,7 @@ void Server::setServerSocket(int servSock) {
 
 User *Server::getUserBySocket(int socket) {
 	
-	for (std::vector<User>::iterator it = users.begin(); it < users.end(); it++) {
+	for (std::list<User>::iterator it = users.begin(); it != users.end(); it++) {
 		if ((*it).getSocket() == socket)
 			return &(*it);
 	}
@@ -236,7 +236,7 @@ User *Server::getUserBySocket(int socket) {
 
 User *Server::getUserByUsername(std::string username) {
 	
-	for (std::vector<User>::iterator it = users.begin(); it < users.end(); it++) {
+	for (std::list<User>::iterator it = users.begin(); it != users.end(); it++) {
 		if ((*it).getUsername() == username)
 			return &(*it);
 	}

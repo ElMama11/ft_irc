@@ -56,7 +56,7 @@ class Server {
 
 		int		serverSocket;
 		std::vector<int>	client_socket;
-		std::vector<User>	users;
+		std::list<User>	users;
 		
 		/* SETTERS & GETTERS */
 		void		setServerSocket(int servSock);

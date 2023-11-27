@@ -14,6 +14,8 @@ Executor::Executor(Server *ptr) {
 	this->_mapping["PASS"] = &Executor::_pass;
 	this->_mapping["MODE"] = &Executor::_mode;
 	this->_mapping["PRIVMSG"] = &Executor::_privmsg;
+	this->_mapping["KICK"] = &Executor::_kick;
+	this->_mapping["TOPIC"] = &Executor::_topic;
 	return ;
 }
 
@@ -29,7 +31,7 @@ void Executor::execOPs(void) {
 			msg = ERR_UNKNOWNCOMMAND(_userPtr, ops[i].type);
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			break;
-		}
+		}.tmp
 		func f = _mapping[ops[i].type];
 		(this->*f)(ops[i].content);	
 		ops[i].type = "";
@@ -101,7 +103,7 @@ void	Executor::joinChannel(std::string firstword, Channel *chanToJoin)
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	msg = RPL_TOPIC(_userPtr, firstword, chanToJoin->getTopic());
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-	msg += RPL_NAMERPLY(_userPtr, (*chanToJoin), chanToJoin->getAllUsersForNameReply());
+	msg = RPL_NAMERPLY(_userPtr, (*chanToJoin), chanToJoin->getAllUsersForNameReply());
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	msg = RPL_ENDOFNAMES(chanToJoin->getName());
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
@@ -361,6 +363,75 @@ void Executor::_sendPrivateMessage(std::string content) {
 	}
 }
 
+void Executor::_kick(std::string content) {
+	std::string chanName, reason, nickToKick, msg;
+	Channel *chan;
+	int i = -1, j = 0, count = 0;
+	while (content[++i])
+		if (content[i] == ' ')
+			j++;
+	if (j < 1) {
+		msg = ERR_NEEDMOREPARAMS(_userPtr, "KICK");
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	chanName = strtok(const_cast<char *>(content.c_str()), " ");
+	chan = getChannelByName(chanName);
+	if (isChannel(chanName) == false) {
+		msg = ERR_NOSUCHCHANNEL(_userPtr, chanName);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	if (chan->isOp(_userPtr) == false) {
+		msg = ERR_CHANOPRIVSNEEDED(_userPtr, chanName);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	nickToKick = strtok(0, " ");
+	if (chan->isOpByNickname(nickToKick) == false && chan->isUserByNickname(nickToKick) == false) {
+		msg = ERR_NOSUCHNICK(_userPtr, nickToKick);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	if (j >= 2)
+		reason = strtok(0, " ");
+	chan->sendKickReplyToAll(chanName, reason, nickToKick, chan);
+	chan->delUser(chan->getUserByNickname(nickToKick));
+}
+
+void Executor::_topic(std::string content) {
+	std::string chanName, topic, msg;
+	Channel *chan;
+	int i = -1, j = 0, count = 0;
+	while (content[++i])
+		if (content[i] == ' ')
+			j++;
+	chanName = strtok(const_cast<char *>(content.c_str()), " ");
+	chan = getChannelByName(chanName);
+	if (isChannel(chanName) == false) {
+		msg = ERR_NOSUCHCHANNEL(_userPtr, chanName);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	if (j == 0) {
+		if (chan->getTopic() == "")
+			msg = RPL_NOTOPIC(_userPtr, chanName);
+		else
+			msg = RPL_TOPIC(_userPtr, chanName, chan->getTopic());
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	}
+	else {
+		if (chan->isOp(_userPtr) == false) {
+			msg = ERR_CHANOPRIVSNEEDED(_userPtr, chanName);
+			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+			return;
+		}
+		topic = strtok(0, "");
+		chan->sendTopicReplyToAll(chanName, topic, chan);
+		chan->setTopic(topic);
+	} //verif op et changer topic dans classe chan et verif si chan existe
+}
+
 Channel *Executor::getChannelByName(std::string channelName) {
 	for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); it++) {
 		if (it->getName() == channelName)
@@ -370,7 +441,7 @@ Channel *Executor::getChannelByName(std::string channelName) {
 }
 
 bool Executor::isUser(User *user) {
-		for(std::vector<User>::iterator it = _server->users.begin(); it != _server->users.end(); it++)
+		for(std::list<User>::iterator it = _server->users.begin(); it != _server->users.end(); it++)
 		if (user->getNickname() == (*it).getNickname())
 			return (true);
 	return (false);
@@ -387,7 +458,8 @@ User *Executor::getUserPtr() {
 
 User *Executor::getPrivateUserByNickname(std::string nickName)
 {
-	for (std::vector<User>::iterator it = _server->users.begin(); it != _server->users.end(); it++) {
+
+	for (std::list<User>::iterator it = _server->users.begin(); it != _server->users.end(); it++) {
 		if ((*it).getNickname() == nickName)
 			return &(*it);
 	}
