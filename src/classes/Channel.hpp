@@ -58,6 +58,7 @@ class	Channel
 		bool			isUserByNickname(std::string nickname);
 		bool			isOpByNickname(std::string nickname);
 		bool			isUserAndOpByNickname(std::string nickname);
+		bool			isUserLeft();
 
 };
 
