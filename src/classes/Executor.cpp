@@ -85,20 +85,19 @@ void Executor::_quit(std::string content) {
 			(*it).delUser(_userPtr);
 		}
 	}
-    while (endOfChannel == false)
+	std::vector<Channel>::iterator ite = _channels.begin();
+	int nbChannels = _channels.size();
+	int i = 0;
+    while (i < nbChannels)
 	{
-		for (std::vector<Channel>::iterator ite = _channels.begin(); ite != _channels.end(); ite++) {
+		for (ite = _channels.begin(); ite != _channels.end(); ite++) 
 			if ((*ite).isUserLeft() == false)
 			{
+				i = 0;
 				_channels.erase(ite);
 				break;
 			}
-			if (ite == _channels.end())
-			{
-				endOfChannel == true;
-
-			}
-		}
+		i++;
 	}
 }
 
@@ -375,7 +374,7 @@ void Executor::_sendMessageToChan(std::string content) {
 void Executor::_sendPrivateMessage(std::string content) {
 	std::string msg, reply, nickToSend;
 	nickToSend = strtok(const_cast<char *>(content.c_str()), " ");
-	if (isUser(_userPtr)) {
+	if (isUserByNickname(nickToSend)) {
 		msg = strtok(0, "");
 		msg = msg.substr(1, msg.size());
 		reply = RPL_PRIVMSG(_userPtr, nickToSend, msg);
@@ -467,6 +466,13 @@ Channel *Executor::getChannelByName(std::string channelName) {
 bool Executor::isUser(User *user) {
 		for(std::list<User>::iterator it = _server->users.begin(); it != _server->users.end(); it++)
 		if (user->getNickname() == (*it).getNickname())
+			return (true);
+	return (false);
+}
+
+bool Executor::isUserByNickname(std::string nick) {
+		for(std::list<User>::iterator it = _server->users.begin(); it != _server->users.end(); it++)
+		if (nick == (*it).getNickname())
 			return (true);
 	return (false);
 }

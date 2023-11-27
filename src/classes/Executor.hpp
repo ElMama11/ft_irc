@@ -59,7 +59,7 @@ class Executor {
 		bool isHash(std::string content);
 		std::string	nextWord(std::string::size_type i, std::string content);
 		bool	isDigit(std::string content);
-
+		bool isUserByNickname(std::string nick);
 		/* GETTERS & SETTERS*/
 		void setUserPtr(User *ptr);
 		User *getUserPtr();
