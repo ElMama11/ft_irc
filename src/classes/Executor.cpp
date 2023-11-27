@@ -31,7 +31,7 @@ void Executor::execOPs(void) {
 			msg = ERR_UNKNOWNCOMMAND(_userPtr, ops[i].type);
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			break;
-		}
+		}.tmp
 		func f = _mapping[ops[i].type];
 		(this->*f)(ops[i].content);	
 		ops[i].type = "";
@@ -465,6 +465,7 @@ User *Executor::getUserPtr() {
 
 User *Executor::getPrivateUserByNickname(std::string nickName)
 {
+
 	for (std::list<User>::iterator it = _server->users.begin(); it != _server->users.end(); it++) {
 		if ((*it).getNickname() == nickName)
 			return &(*it);
