@@ -117,7 +117,7 @@ class Server {
 			public:
 				virtual const char *what() const throw()
 				{
-					return ("Program terminated");
+					return ("\nProgram terminated");
 				}
 		};
 };

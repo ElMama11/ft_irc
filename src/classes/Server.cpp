@@ -70,10 +70,7 @@ int Server::awaitForConnection() {
 void sigHandler(int signal)
 {
 	if (signal == SIGINT)
-	{
 		progOver = true;
-		std::cerr << "over" << std::endl;
-	}
 }
 
 void Server::handle() {
@@ -191,7 +188,6 @@ void Server::_acceptIncomingConnection() {
 	if (FD_ISSET(this->serverSocket, &_readfds)) {
 		if ((new_socket = accept(this->serverSocket, (struct sockaddr *)&_hint, (socklen_t*)&_hintlen)) < 0)
 		{
-			pr("asdasd");
 			throw acceptSocketError();
 		}
 		printf("New connection, socket fd is %d, ip is : %s, port : %d \n", new_socket, inet_ntoa(_hint.sin_addr), ntohs(_hint.sin_port));
