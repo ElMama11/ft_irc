@@ -85,19 +85,20 @@ void Executor::_quit(std::string content) {
 			(*it).delUser(_userPtr);
 		}
 	}
-	std::vector<Channel>::iterator start = _channels.begin();
-	std::vector<Channel>::iterator end = _channels.begin();
+    while (endOfChannel == false)
+	{
+		for (std::vector<Channel>::iterator ite = _channels.begin(); ite != _channels.end(); ite++) {
+			if ((*ite).isUserLeft() == false)
+			{
+				_channels.erase(ite);
+				break;
+			}
+			if (ite == _channels.end())
+			{
+				endOfChannel == true;
 
-	if (start != _channels.end())
-		start++;
-	while (end != _channels.end()) {
-		if ((*end).isUserLeft() == true)
-		{
-			_channels.erase(end);
+			}
 		}
-		end = start;
-		if (start != _channels.end())
-			start++;
 	}
 }
 
