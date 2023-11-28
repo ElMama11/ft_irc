@@ -35,6 +35,7 @@ class Executor {
 		void _privmsg(std::string content);
 		void _kick(std::string content);
 		void _topic(std::string content);
+		void _invite(std::string content);
 
 		void _createChannel(std::string content);
 		void _sendMessageToChan(std::string content);
