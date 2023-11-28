@@ -336,6 +336,18 @@ void Channel::sendQuitReplyToAll(std::string msg) {
 	}
 }
 
+void Channel::sendModeReplyToAll(std::string msg)
+{
+	for (std::vector<User *>::iterator it = _op.begin(); it != _op.end(); it++)
+	{
+		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
+	}
+	for (std::vector<User *>::iterator it = _user.begin(); it != _user.end(); it++)
+	{
+		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
+
 bool Channel::isUserLeft()
 {
 	for (std::vector<User *>::iterator it = _op.begin(); it != _op.end(); it++)

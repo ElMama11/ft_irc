@@ -13,3 +13,9 @@
 :lion.anthrochat.net MODE #channnn +nt 
 :lion.anthrochat.net  nickss = #channnn :@nickss 
 :lion.anthrochat.net 363536 nickss #channnn :End of /NAMES list.
+
+
+
+
+cas ou :
+client rejoint un channel ou il est deja

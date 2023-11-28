@@ -268,22 +268,30 @@ bool	Executor::isDigit(std::string content)
 void Executor::_mode(std::string content)
 {
 	std::string	arg;
-	size_t		pos = content.find(' ');
+	std::string msg;
+	size_t		pos = 0;
+	pos = content.find(' ');
 	std::vector<Channel>::iterator it = _channels.begin();
-
 	std::string	firstWord = content.substr(0, pos);
-	pos = content.find('\r');
-	content = content.substr(0, pos);
+	pos = content.find(' ');
 	while (it != _channels.end() && (*it).getName() != firstWord)
 		it++;
 	if (it == _channels.end())
 	{
-		std::cout << content << "---error, channel not found" << std::endl; // le channel n'existe pas
+		msg = ERR_NOSUCHCHANNEL(_userPtr, (*it).getName());
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 		return ;
+	}
+	else if (content == (*it).getName())
+	{
+		msg = RPL_CHANNELMODEIS(_userPtr, (*it).getName(), "+i");
+		pr(msg);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 	else if ((*it).isOp(_userPtr) == false)
 	{
-		std::cout << "error, you not operator in this channel" << std::endl; // n'est pas operator du channel
+		msg = ERR_CHANOPRIVSNEEDED(_userPtr, (*it).getName());
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 		return ;
 	}
 	else
@@ -316,9 +324,14 @@ void Executor::_mode(std::string content)
 						User	*tmp = (*it).getUserByNickname(user);
 						(*it).delUser(tmp);
 						(*it).addUser(tmp, true);
+						msg = RPL_MODE(_userPtr, (*it).getName(), "+o", user);
+						(*it).sendModeReplyToAll(msg);
 					}
 					else
-						std::cout << "error, user not found" << std::endl; // l'utilisateur cible n'est pas dans le channel
+					{
+						msg = ERR_USERNOTINCHANNEL(_userPtr, user, (*it).getName());
+						send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+					}
 				}
 				else if (arg == "-o")
 				{
@@ -327,9 +340,14 @@ void Executor::_mode(std::string content)
 					{
 						(*it).delUser(tmp);
 						(*it).addUser(tmp, false);
+						msg = RPL_MODE(_userPtr, (*it).getName(), "-o", nextWord(i, content));
+						(*it).sendModeReplyToAll(msg);
 					}
 					else
-						std::cout << "error, user not operator" << std::endl; // l'utilisateur cible n'est pas dans la liste des operator, faire la distinction avec son absence dans le channel ?
+					{
+						msg = ERR_USERNOTINCHANNEL(_userPtr, tmp->getNickname(), (*it).getName());
+						send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+					}
 				}
 				else if (arg == "+l")
 				{

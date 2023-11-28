@@ -52,6 +52,7 @@ class	Channel
 		void			sendKickReplyToAll(std::string chanName, std::string reason, std::string nickToKick, Channel *chan);
 		void			sendTopicReplyToAll(std::string chanName, std::string topic, Channel *chan);
 		void			sendQuitReplyToAll(std::string msg);
+		void			sendModeReplyToAll(std::string msg);
 
 		std::string		getNicknameWithPrefix(User *user);
 		bool			isOp(User *user);
