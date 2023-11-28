@@ -4,7 +4,7 @@
 # define OPER_NAME "admin"
 # define OPER_PASS "admin"
 
-#define RPL_INVITE_RCV(client, channelName, targetName) ":" + client.getNickname() + " INVITE " + targetName + " :" + channelName + "\n"
+#define RPL_INVITE_RCV(client, channelName, targetName) ":" + client->getNickname() + " INVITE " + targetName + " :" + channelName + "\n"
 #define RPL_JOIN(nickname, channelName) ":" + nickname + " JOIN :" + channelName + "\n"
 #define RPL_PRIVMSG(client, targetName, message) ":" + client->getNickname() + "!" + client->getUsername() + "@localhost PRIVMSG " + targetName + " :" + message + "\n"
 #define RPL_KICK(senderNick, channelName, targetNick, reason) ":" + senderNick + " KICK " + channelName + " " + targetNick + " " + reason + "\n"

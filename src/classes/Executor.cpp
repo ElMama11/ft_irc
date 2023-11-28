@@ -16,6 +16,7 @@ Executor::Executor(Server *ptr) {
 	this->_mapping["PRIVMSG"] = &Executor::_privmsg;
 	this->_mapping["KICK"] = &Executor::_kick;
 	this->_mapping["TOPIC"] = &Executor::_topic;
+	this->_mapping["INVITE"] = &Executor::_invite;
 	return ;
 }
 
@@ -452,7 +453,46 @@ void Executor::_topic(std::string content) {
 		topic = strtok(0, "");
 		chan->sendTopicReplyToAll(chanName, topic, chan);
 		chan->setTopic(topic);
-	} //verif op et changer topic dans classe chan et verif si chan existe
+	}
+}
+
+void Executor::_invite(std::string content) {
+	std::string msg, nickToInvite, chanName;
+	Channel *chanToInvite;
+	nickToInvite = strtok(const_cast<char *>(content.c_str()), " ");
+	chanName = strtok(0, " ");
+	chanToInvite = getChannelByName(chanName);
+	if (chanToInvite == NULL) {
+		msg = ERR_NOSUCHCHANNEL(_userPtr, chanName);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	if (chanToInvite->getInviteOnly() == 1 && chanToInvite->isOp(_userPtr) == false) {
+		msg = ERR_CHANOPRIVSNEEDED(_userPtr, chanName);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	if (chanToInvite->getUser(_userPtr->getSocket()) == NULL) {
+		msg = ERR_NOTONCHANNEL(chanName);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	if (isUserByNickname(nickToInvite) == false) {
+		msg = ERR_NOSUCHNICK(_userPtr, nickToInvite);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	if (chanToInvite->isUserAndOpByNickname(nickToInvite) == true) {
+		msg = ERR_USERONCHANNEL(nickToInvite, chanName);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	User *userToInvite = getPrivateUserByNickname(nickToInvite);
+	userToInvite->invitationList.push_back(chanName);
+	msg = RPL_INVITING(chanName, nickToInvite);
+	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	msg = RPL_INVITE_RCV(_userPtr, chanName, nickToInvite);
+	send(userToInvite->getSocket(), msg.c_str(), msg.size(), 0);
 }
 
 Channel *Executor::getChannelByName(std::string channelName) {
@@ -472,8 +512,8 @@ bool Executor::isUser(User *user) {
 
 bool Executor::isUserByNickname(std::string nick) {
 		for(std::list<User>::iterator it = _server->users.begin(); it != _server->users.end(); it++)
-		if (nick == (*it).getNickname())
-			return (true);
+			if (nick == (*it).getNickname())
+				return (true);
 	return (false);
 }
 

@@ -287,6 +287,16 @@ bool		Channel::isOpByNickname(std::string nickname)
 	return (false);
  }
 
+bool		Channel::isUserAndOpByNickname(std::string nickname) {
+	for (std::vector<User *>::iterator it = _user.begin(); it != _user.end(); it++)
+		if (nickname == (*it)->getNickname())
+			return (true);
+	for (std::vector<User *>::iterator it = _op.begin(); it != _op.end(); it++)
+		if (nickname == (*it)->getNickname())
+			return (true);
+	return (false);
+}
+
 std::string		Channel::getAllUsersForNameReply()
 {
 	std::string names;
