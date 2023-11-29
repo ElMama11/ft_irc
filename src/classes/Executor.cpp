@@ -349,6 +349,11 @@ void Executor::_mode(std::string content)
 }
 
 void Executor::_privmsg(std::string content) {
+	if (content.empty()) {
+		std::string msg = ERR_NEEDMOREPARAMS(_userPtr, "privmsg");
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
 	if (content[0] == '#')
 		_sendMessageToChan(content);
 	else
@@ -375,6 +380,15 @@ void Executor::_sendMessageToChan(std::string content) {
 
 void Executor::_sendPrivateMessage(std::string content) {
 	std::string msg, reply, nickToSend;
+	int i = -1, j = 0;
+	while (content[++i])
+		if (content[i] == ' ')
+			j++;
+	if (j == 0) {
+		msg = ERR_NEEDMOREPARAMS(_userPtr, "privmsg");
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
 	nickToSend = strtok(const_cast<char *>(content.c_str()), " ");
 	if (isUserByNickname(nickToSend)) {
 		msg = strtok(0, "");
