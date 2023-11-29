@@ -119,6 +119,8 @@ void Executor::_user(std::string content) {
 		this->_userPtr->setRealname(params[3]);
 	std::string msg = RPL_WELCOME(_userPtr);
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	msg = RPL_YOURHOST(_userPtr);
+	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
 
 void	Executor::joinChannel(std::string firstword, Channel *chanToJoin)
@@ -164,7 +166,8 @@ void Executor::_join(std::string content) {
 	if (!isChannel(firstword)) {
 		_createChannel(firstword);
 	}
-	else {
+	else
+	{
 		Channel *chanToJoin = getChannelByName(firstword);
 		if (chanToJoin == NULL) {
 			msg = ERR_NOSUCHCHANNEL(_userPtr, firstword);
@@ -181,7 +184,8 @@ void Executor::_join(std::string content) {
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			return;
 		}
-		else if (chanToJoin->getPass() != "") {
+		else if (chanToJoin->getPass() != "")
+		{
 			int end, start = 0;
 			start = content.find(" ");
 			start++;
@@ -194,9 +198,21 @@ void Executor::_join(std::string content) {
 				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 				return;
 			}
+			else if (chanToJoin->isUserAndOpByNickname(_userPtr->getNickname()))
+			{
+				msg = ERR_USERONCHANNEL(_userPtr->getNickname(), chanToJoin->getName());
+				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+			}
 			else
+			{
 				joinChannel(firstword, chanToJoin);	
-		}	//	JOIN WITH GOOD PASSWORD
+			}
+		}
+		else if (chanToJoin->isUserAndOpByNickname(_userPtr->getNickname()))
+		{
+			msg = ERR_USERONCHANNEL(_userPtr->getNickname(), chanToJoin->getName());
+			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		}
 		else
 			joinChannel(firstword, chanToJoin);	
 	}
@@ -228,8 +244,6 @@ void Executor::_createChannel(std::string content) {
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	msg = RPL_ENDOFNAMES(newChan.getName());
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-	// for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); it++)
-	// 	pr((*it).getName());   		Delete channel quand y a plus personne
 }
 
 bool Executor::isChannel(std::string channel)
@@ -285,9 +299,10 @@ void Executor::_mode(std::string content)
 	}
 	else if (content == (*it).getName())
 	{
-		msg = RPL_CHANNELMODEIS(_userPtr, (*it).getName(), "+i");
-		pr(msg);
+		msg = RPL_CHANNELMODEIS(_userPtr, (*it).getName(), "");
+		std::string test = RPL_CREATIONTIME(_userPtr, (*it).getName(), "1701196120");
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		send(_userPtr->getSocket(), test.c_str(), test.size(), 0);
 	}
 	else if ((*it).isOp(_userPtr) == false)
 	{
