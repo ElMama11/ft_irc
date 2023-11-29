@@ -104,7 +104,7 @@ void Server::handle() {
 					close(*it);
 			throw sigintReceived();
 		}
-		if ((activity < 0) && (errno != EINTR))
+		if ((activity < 0))
 			std::cerr << "Error: select()" << std::endl;
 		//If something happened on the master socket, then its an incoming connection else its some IO operation on some other socket 
 		_acceptIncomingConnection();

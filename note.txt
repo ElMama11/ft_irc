@@ -14,7 +14,10 @@
 :lion.anthrochat.net  nickss = #channnn :@nickss 
 :lion.anthrochat.net 363536 nickss #channnn :End of /NAMES list.
 
- mama1 sets mode +i on #s
+secure _nick
+verif les pastille d'op quand mode +o
+securiser si USER est tape avant _pass
+verif que qq est un dans un channel avant d'ecrire dedans
 
 
 cas ou :

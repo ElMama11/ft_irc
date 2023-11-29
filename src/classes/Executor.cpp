@@ -67,8 +67,13 @@ void Executor::_cap(std::string content) {
 }
 
 void Executor::_nick(std::string content) {
+	// for (std::list<User>::iterator ite = _server->users.begin(); ite != _server->users.end(); ite++) {
+	// 	if((*ite).getNickname() == content) {
+	// 		_server->errorMsg("Same nickname is on the server.", _userPtr->getSocket());
+	// 		return;
+	// 	}
+	// }
 	_userPtr->setNickname(content);
-
 }
 
 void Executor::_quit(std::string content) {
