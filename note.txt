@@ -14,7 +14,7 @@
 :lion.anthrochat.net  nickss = #channnn :@nickss 
 :lion.anthrochat.net 363536 nickss #channnn :End of /NAMES list.
 
-
+ mama1 sets mode +i on #s
 
 
 cas ou :

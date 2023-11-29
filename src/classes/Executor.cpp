@@ -14,6 +14,7 @@ Executor::Executor(Server *ptr) {
 	this->_mapping["PASS"] = &Executor::_pass;
 	this->_mapping["MODE"] = &Executor::_mode;
 	this->_mapping["PRIVMSG"] = &Executor::_privmsg;
+	this->_mapping["privmsg"] = &Executor::_privmsg;
 	this->_mapping["KICK"] = &Executor::_kick;
 	this->_mapping["TOPIC"] = &Executor::_topic;
 	this->_mapping["INVITE"] = &Executor::_invite;
@@ -119,8 +120,6 @@ void Executor::_user(std::string content) {
 		this->_userPtr->setRealname(params[3]);
 	std::string msg = RPL_WELCOME(_userPtr);
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-	msg = RPL_YOURHOST(_userPtr);
-	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
 
 void	Executor::joinChannel(std::string firstword, Channel *chanToJoin)
@@ -166,8 +165,7 @@ void Executor::_join(std::string content) {
 	if (!isChannel(firstword)) {
 		_createChannel(firstword);
 	}
-	else
-	{
+	else {
 		Channel *chanToJoin = getChannelByName(firstword);
 		if (chanToJoin == NULL) {
 			msg = ERR_NOSUCHCHANNEL(_userPtr, firstword);
@@ -184,8 +182,7 @@ void Executor::_join(std::string content) {
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			return;
 		}
-		else if (chanToJoin->getPass() != "")
-		{
+		else if (chanToJoin->getPass() != "") {
 			int end, start = 0;
 			start = content.find(" ");
 			start++;
@@ -198,21 +195,9 @@ void Executor::_join(std::string content) {
 				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 				return;
 			}
-			else if (chanToJoin->isUserAndOpByNickname(_userPtr->getNickname()))
-			{
-				msg = ERR_USERONCHANNEL(_userPtr->getNickname(), chanToJoin->getName());
-				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-			}
 			else
-			{
 				joinChannel(firstword, chanToJoin);	
-			}
-		}
-		else if (chanToJoin->isUserAndOpByNickname(_userPtr->getNickname()))
-		{
-			msg = ERR_USERONCHANNEL(_userPtr->getNickname(), chanToJoin->getName());
-			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-		}
+		}	//	JOIN WITH GOOD PASSWORD
 		else
 			joinChannel(firstword, chanToJoin);	
 	}
@@ -244,6 +229,8 @@ void Executor::_createChannel(std::string content) {
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	msg = RPL_ENDOFNAMES(newChan.getName());
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	// for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); it++)
+	// 	pr((*it).getName());   		Delete channel quand y a plus personne
 }
 
 bool Executor::isChannel(std::string channel)
@@ -283,31 +270,22 @@ bool	Executor::isDigit(std::string content)
 void Executor::_mode(std::string content)
 {
 	std::string	arg;
-	std::string msg;
-	size_t		pos = 0;
-	pos = content.find(' ');
+	size_t		pos = content.find(' ');
 	std::vector<Channel>::iterator it = _channels.begin();
+
 	std::string	firstWord = content.substr(0, pos);
-	pos = content.find(' ');
+	pos = content.find('\r');
+	content = content.substr(0, pos);
 	while (it != _channels.end() && (*it).getName() != firstWord)
 		it++;
 	if (it == _channels.end())
 	{
-		msg = ERR_NOSUCHCHANNEL(_userPtr, (*it).getName());
-		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		std::cout << content << "---error, channel not found" << std::endl; // le channel n'existe pas
 		return ;
-	}
-	else if (content == (*it).getName())
-	{
-		msg = RPL_CHANNELMODEIS(_userPtr, (*it).getName(), "");
-		std::string test = RPL_CREATIONTIME(_userPtr, (*it).getName(), "1701196120");
-		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-		send(_userPtr->getSocket(), test.c_str(), test.size(), 0);
 	}
 	else if ((*it).isOp(_userPtr) == false)
 	{
-		msg = ERR_CHANOPRIVSNEEDED(_userPtr, (*it).getName());
-		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		std::cout << "error, you not operator in this channel" << std::endl; // n'est pas operator du channel
 		return ;
 	}
 	else
@@ -340,14 +318,9 @@ void Executor::_mode(std::string content)
 						User	*tmp = (*it).getUserByNickname(user);
 						(*it).delUser(tmp);
 						(*it).addUser(tmp, true);
-						msg = RPL_MODE(_userPtr, (*it).getName(), "+o", user);
-						(*it).sendModeReplyToAll(msg);
 					}
 					else
-					{
-						msg = ERR_USERNOTINCHANNEL(_userPtr, user, (*it).getName());
-						send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-					}
+						std::cout << "error, user not found" << std::endl; // l'utilisateur cible n'est pas dans le channel
 				}
 				else if (arg == "-o")
 				{
@@ -356,14 +329,9 @@ void Executor::_mode(std::string content)
 					{
 						(*it).delUser(tmp);
 						(*it).addUser(tmp, false);
-						msg = RPL_MODE(_userPtr, (*it).getName(), "-o", nextWord(i, content));
-						(*it).sendModeReplyToAll(msg);
 					}
 					else
-					{
-						msg = ERR_USERNOTINCHANNEL(_userPtr, tmp->getNickname(), (*it).getName());
-						send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-					}
+						std::cout << "error, user not operator" << std::endl; // l'utilisateur cible n'est pas dans la liste des operator, faire la distinction avec son absence dans le channel ?
 				}
 				else if (arg == "+l")
 				{
