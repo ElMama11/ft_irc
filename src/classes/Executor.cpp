@@ -262,14 +262,16 @@ bool Executor::isHash(std::string content)
 	return (true);
 }
 
-std::string	Executor::nextWord(std::string::size_type i, std::string content)
+std::string	Executor::nextWord(std::string content)
 {
-	std::string::size_type start = i + 1;
-	std::string::size_type end = i + 1;
+	std::string firstword;
+	std::string secword;
+	std::istringstream iss(content);
 
-	while (content[end] != ' ' && content[end] != 13 && content[end] != '\0')
-		end++;
-	return (content.substr(start, end - start));
+	iss >> firstword >> firstword >> secword;
+	if (firstword == secword)
+		return ("");
+	return (secword);
 }
 
 bool	Executor::isDigit(std::string content)
@@ -284,6 +286,9 @@ void Executor::_mode(std::string content)
 {
 	std::string	arg;
 	std::string msg;
+	std::string channel;
+	std::istringstream iss(content);
+	iss >> channel >> arg;
 	size_t		pos = 0;
 	pos = content.find(' ');
 	std::vector<Channel>::iterator it = _channels.begin();
@@ -296,6 +301,11 @@ void Executor::_mode(std::string content)
 		msg = ERR_NOSUCHCHANNEL(_userPtr, (*it).getName());
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 		return ;
+	}
+	else if (arg.empty())
+	{
+		msg = ERR_NEEDMOREPARAMS(_userPtr, "MODE");
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 	else if (content == (*it).getName())
 	{
@@ -312,70 +322,67 @@ void Executor::_mode(std::string content)
 	}
 	else
 	{
-		std::string::size_type start = 0;
-
-		for (std::string::size_type i = 0; i <= content.length(); i++)
+		if (channel != arg)
 		{
-			if (content[i] == ' ' || i == content.length())
+			if (arg == "+i")
+				(*it).setInviteOnly(true);
+			else if (arg == "-i")
+				(*it).setInviteOnly(false);
+			else if (arg == "+t")
+				(*it).setTopicRestrictionForOp(true);
+			else if (arg == "-t")
+				(*it).setTopicRestrictionForOp(false);
+			else if (arg == "-k")
+				(*it).setPass("");
+			else if (arg == "-l")
+				(*it).setUserLimits(UINT_MAX);
+			else if (nextWord(content) == "")
 			{
-				arg = content.substr(start, i - start);
-				if (arg == "+i")
-					(*it).setInviteOnly(true);
-				else if (arg == "-i")
-					(*it).setInviteOnly(false);
-				else if (arg == "+t")
-					(*it).setTopicRestrictionForOp(true);
-				else if (arg == "-t")
-					(*it).setTopicRestrictionForOp(false);
-				else if (arg == "+k")
-					(*it).setPass(nextWord(i, content));
-				else if (arg == "-k")
-					(*it).setPass("");
-				else if (arg == "+o")
-				{
-					std::string user = nextWord(i, content);
-
-					if ((*it).isUserByNickname(user))
-					{
-						User	*tmp = (*it).getUserByNickname(user);
-						(*it).delUser(tmp);
-						(*it).addUser(tmp, true);
-						msg = RPL_MODE(_userPtr, (*it).getName(), "+o", user);
-						(*it).sendModeReplyToAll(msg);
-					}
-					else
-					{
-						msg = ERR_USERNOTINCHANNEL(_userPtr, user, (*it).getName());
-						send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-					}
-				}
-				else if (arg == "-o")
-				{
-					User	*tmp = (*it).getUserByNickname(nextWord(i, content));
-					if ((*it).isOp(tmp))
-					{
-						(*it).delUser(tmp);
-						(*it).addUser(tmp, false);
-						msg = RPL_MODE(_userPtr, (*it).getName(), "-o", nextWord(i, content));
-						(*it).sendModeReplyToAll(msg);
-					}
-					else
-					{
-						msg = ERR_USERNOTINCHANNEL(_userPtr, tmp->getNickname(), (*it).getName());
-						send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-					}
-				}
-				else if (arg == "+l")
-				{
-					if (isDigit(nextWord(i, content)))
-						(*it).setUserLimits(static_cast<unsigned int>(std::atoi(nextWord(i, content).c_str())));
-					else
-						std::cout << "error, num only for user limit" << std::endl;
-				}
-				else if (arg == "-l")
-					(*it).setUserLimits(UINT_MAX);
-				start = i + 1;
+				msg = ERR_NEEDMOREPARAMS(_userPtr, arg);
+				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			}
+			else if (arg == "+o")
+			{
+				std::string user = nextWord(content);
+				if ((*it).isUserByNickname(user))
+				{
+					User	*tmp = (*it).getUserByNickname(user);
+					(*it).delUser(tmp);
+					(*it).addUser(tmp, true);
+					msg = RPL_MODE(_userPtr, (*it).getName(), "+o", user);
+					(*it).sendModeReplyToAll(msg);
+				}
+				else
+				{
+					msg = ERR_USERNOTINCHANNEL(_userPtr, user, (*it).getName());
+					send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+				}
+			}
+			else if (arg == "-o")
+			{
+				User	*tmp = (*it).getUserByNickname(nextWord(content));
+				if ((*it).isOp(tmp))
+				{
+					(*it).delUser(tmp);
+					(*it).addUser(tmp, false);
+					msg = RPL_MODE(_userPtr, (*it).getName(), "-o", nextWord(content));
+					(*it).sendModeReplyToAll(msg);
+				}
+				else
+				{
+					msg = ERR_USERNOTINCHANNEL(_userPtr, tmp->getNickname(), (*it).getName());
+					send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+				}
+			}
+			else if (arg == "+l")
+			{
+				if (isDigit(nextWord(content)))
+					(*it).setUserLimits(static_cast<unsigned int>(std::atoi(nextWord(content).c_str())));
+				else
+					std::cout << "error, num only for user limit" << std::endl;
+			}
+			else if (arg == "+k")
+				(*it).setPass(nextWord(content));
 		}
 	}
 }
