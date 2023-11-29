@@ -11,14 +11,14 @@
 #define RPL_MODE(user, channelName, message, targetName) ":" + user->getNickname() + "!~" + user->getUsername() + "@" SERV_NAME " MODE " + channelName + " " + message + " " + targetName + "\n"
 
 /* 001 */ #define RPL_WELCOME(client) ":IRC 001 " + client->getNickname() + " :Welcome to the IRC network, " + client->getNickname() + "!" + "\n"
-/* 002 */ #define RPL_YOURHOST(client) ":IRC 002 " + client.getNickname() + " :Your host is 42_irc, running beta" + "\n"
+/* 002 */ #define RPL_YOURHOST(client) ":IRC 002 " + client->getNickname() + " :Your host is ft_irc, running beta" + "\n"
 /* 003 */ #define RPL_CREATED(client, date) ":IRC 003 " + client.getNickname() + " :This server was created " + date + "\n"
 /* 005 */ #define RPL_ISUPPORT(client) ":IRC 005 " + client.getNickname() + " TARGMAX=INVITE:1,PART:1,JOIN:1,KICK:1,PRIVMSG:1,WHOIS:1 CHANTYPES=# :are supported by this server" + "\n"
 
 /* 302 */ #define NICK(oldNickname, newNickname) ":" + oldNickname + " NICK :" + newNickname + "\n"
 /* 315 */ #define RPL_ENDOFWHO(client) ":" SERV_NAME " 315 " + client.getNickname() + " :End of WHO list" + "\n"
-/* 324 */ #define RPL_CHANNELMODEIS(client, channel, mode) ":" SERV_NAME " 324 " + client->getNickname() + " " + channel + " " + mode + "\n"
-/* 329 */ #define RPL_CREATIONTIME(client, channel, theTime) ":" SERV_NAME " 329 " + client.getNickname() + " " + channel + " " + theTime + "\n"
+/* 324 */ #define RPL_CHANNELMODEIS(client, channel, mode) ":" SERV_NAME " 324 " + client->getNickname() + " " + channel + " " + mode + "\r\n"
+/* 329 */ #define RPL_CREATIONTIME(client, channel, theTime) ":" SERV_NAME " 329 " + client->getNickname() + " " + channel + " " + theTime + "\r\n"
 /* 331 */ #define RPL_NOTOPIC(client, channelName) ":" SERV_NAME " 331 " + client->getNickname() + " " + channelName + " :No topic is set" + "\n"
 /* 332 */ #define RPL_TOPIC(client, channelName, topicText) ":" SERV_NAME " 332 " + client->getNickname() + " " + channelName + " " + topicText + "\n"
 /* 341 */ #define RPL_INVITING(channelName, targetName) ":" SERV_NAME " 341 " + channelName + " " + targetName + "\n"
