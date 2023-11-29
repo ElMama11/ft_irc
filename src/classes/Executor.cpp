@@ -460,7 +460,7 @@ void Executor::_topic(std::string content) {
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 	else {
-		if (chan->isOp(_userPtr) == false) {
+		if (chan->isOp(_userPtr) == false && chan->getTopicRestrictionForOp() == false) {
 			msg = ERR_CHANOPRIVSNEEDED(_userPtr, chanName);
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			return;

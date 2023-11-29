@@ -6,7 +6,7 @@ Channel::Channel(std::string chanName, User *userPtr) {
 	for (std::string::size_type i = 0; i < chanName.length(); i++)
 		if (chanName[i] != '\r')
 			_name += chanName[i];
-	_topicRestrictionForOp = true;
+	_topicRestrictionForOp = false;
 	_inviteOnly = false;
 	_userLimits = UINT_MAX;
 	_topic = "";
