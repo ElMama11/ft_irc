@@ -61,12 +61,13 @@ class Executor {
 		std::string	nextWord(std::string content);
 		bool	isDigit(std::string content);
 		bool isUserByNickname(std::string nick);
+		void	joinChannel(std::string firstword, Channel *chanToJoin);
+		User *getPrivateUserByNickname(std::string nickName);
+		bool isOnlySpace(std::string str);
 		/* GETTERS & SETTERS*/
 		void setUserPtr(User *ptr);
 		User *getUserPtr();
-		User *getPrivateUserByNickname(std::string nickName);
 
-		void	joinChannel(std::string firstword, Channel *chanToJoin);
 
 
 };

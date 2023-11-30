@@ -68,12 +68,29 @@ void Executor::_cap(std::string content) {
 }
 
 void Executor::_nick(std::string content) {
-	// for (std::list<User>::iterator ite = _server->users.begin(); ite != _server->users.end(); ite++) {
-	// 	if((*ite).getNickname() == content) {
-	// 		_server->errorMsg("Same nickname is on the server.", _userPtr->getSocket());
-	// 		return;
-	// 	}
-	// }
+	std::string msg;
+	if (content.find('#') != std::string::npos || content.find(':') != std::string::npos) {
+		msg =  ERR_ERRONEUSNICKNAME(content);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	for (std::list<User>::iterator ite = _server->users.begin(); ite != _server->users.end(); ite++) {
+		if((*ite).getNickname() == content) {
+			msg = ERR_NICKNAMEINUSE((*ite).getNickname());
+			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+			return;
+		}
+	}
+	if (content == "NICK" || isOnlySpace(content) == true) {
+		msg = ERR_NONICKNAMEGIVEN();
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return ;
+	}
+	if (!(_userPtr->getNickname().empty())) {
+		msg = NICK(_userPtr->getNickname(), content);
+		for (std::list<User>::iterator it = _server->users.begin(); it != _server->users.end(); it++)
+			send((*it).getSocket() , msg.c_str(), msg.size(), 0);
+	}
 	_userPtr->setNickname(content);
 }
 
@@ -110,12 +127,26 @@ void Executor::_quit(std::string content) {
 
 void Executor::_user(std::string content) {
 	std::istringstream iss(content);
-	std::string tmp;
+	std::string tmp, msg;
 	std::vector<std::string> params;
-
 	if (_userPtr->checkPassword == false) {
 		_pass("");
 		return;
+	}
+	if (_userPtr->getNickname().empty()) {
+		msg = "ERROR: Nickname empty\n";
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return ;
+	}
+	if (!(_userPtr->getUsername().empty())) {
+		msg = ERR_ALREADYREGISTRED(_userPtr->getNickname());
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return ;
+	}
+	if (content == "USER" || isOnlySpace(content) == true) {
+		msg = ERR_NEEDMOREPARAMS(_userPtr, "USER");
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return ;
 	}
 	while (std::getline(iss, tmp, ' '))
 		params.push_back(tmp);
@@ -123,7 +154,7 @@ void Executor::_user(std::string content) {
 		this->_userPtr->setUsername(params[0]);
 	if (params.size() >= 4)
 		this->_userPtr->setRealname(params[3]);
-	std::string msg = RPL_WELCOME(_userPtr);
+	msg = RPL_WELCOME(_userPtr);
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
 
@@ -162,7 +193,7 @@ void Executor::_join(std::string content) {
 	std::istringstream iss(content);
 	iss >> firstword;
 
-	if (firstword.find('#') == -1 || firstword == "#") {
+	if (firstword.find('#') == std::string::npos || firstword == "#") {
 		msg = ERR_INVALIDCHANNEL(_userPtr, firstword);
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 		return ;
@@ -210,7 +241,7 @@ void Executor::_join(std::string content) {
 
 
 void Executor::_pass(std::string content) {
-	if(content.find(13) != -1) {
+	if(content.find(13) != std::string::npos) {
 		content.erase(content.find(13));
 	}
 	if (_server->getPassword().compare(content) == 0) {
@@ -218,10 +249,9 @@ void Executor::_pass(std::string content) {
 		return ;
 	}
 	else {
-		_userPtr->setNickname("placeholder");
 		std::string msg = ERR_PASSWDMISMATCH(_userPtr);
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-		_server->errorMsg("ERROR :Closing Link: localhost (Bad Password)\n<connection gets terminated by the server>\n", _userPtr->getSocket());
+		_server->errorMsg("Closing Link: localhost (Bad or empty Password)\n<connection gets terminated by the server>\n", _userPtr->getSocket());
 	}
 }
 
@@ -586,6 +616,16 @@ bool Executor::isUserByNickname(std::string nick) {
 			if (nick == (*it).getNickname())
 				return (true);
 	return (false);
+}
+
+bool Executor::isOnlySpace(std::string str) {
+	int i = 0;
+	while (str[i]) {
+		if (str[i] != ' ')
+			return false;
+		i++;
+	}
+	return true;
 }
 
  /* GETTERS & SETTERS */

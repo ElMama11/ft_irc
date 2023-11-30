@@ -34,7 +34,7 @@
 /* 403 */ #define ERR_INVALIDCHANNEL(client, channelName) ":" SERV_NAME " 403 " + client->getNickname() + " " + channelName + " :Invalid channel name" + "\n"
 /* 416 */ #define ERR_TOOMANYMATCHES(client) ":" SERV_NAME " 416 " + client.getNickname() + " :Command or message too long" + "\n"
 /* 421 */ #define ERR_UNKNOWNCOMMAND(client, command) ":" SERV_NAME " 421 " + client->getNickname() + " " + command + " :Unknown command" + "\n"
-/* 431 */ #define ERR_NONICKNAMEGIVEN(clientname) ":" SERV_NAME " 431 " + clientname + " :No nickname given" + "\n"
+/* 431 */ #define ERR_NONICKNAMEGIVEN() ":" SERV_NAME " 431 :No nickname given\n"
 /* 432      */ #define ERR_ERRONEUSNICKNAME(nickname) ":" SERV_NAME " 432 Error " + nickname + " :Erroneous nickname" + "\n"
 /* 433 */ #define ERR_NICKNAMEINUSE(clientName) ":" SERV_NAME " 433 * " + clientName + " :Nickname is already in use" + "\n"
 /* 441 */ #define ERR_USERNOTINCHANNEL(client, targetName, channelName) ":" SERV_NAME " 441 " + client->getNickname() + " " + channelName + " " + targetName + " :They aren't on that channel" + "\n"
