@@ -294,52 +294,43 @@ void Executor::_mode(std::string content)
 	std::vector<Channel>::iterator it = _channels.begin();
 	std::string	firstWord = content.substr(0, pos);
 	pos = content.find(' ');
-	pr("A");
 	while (it != _channels.end())
 	{
 		if ((*it).getName() == firstWord)
 			break;
 		it++;
 	}
-	pr("B");
 	if (channel == "")
 	{
-	pr("C");
 		msg = ERR_NEEDMOREPARAMS(_userPtr, "MODE");
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 	else if (it == _channels.end())
 	{
-	pr("D");
 		msg = ERR_NOSUCHCHANNEL(_userPtr, channel);
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 		return ;
 	}
 	else if (arg.empty())
 	{
-	pr("E");
 		msg = CHANMODES((*it).getActiveModes());
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 	else if (content == (*it).getName())
 	{
-	pr("F");
 		msg = RPL_CHANNELMODEIS(_userPtr, (*it).getName(), "");
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 	else if ((*it).isOp(_userPtr) == false)
 	{
-	pr("G");
 		msg = ERR_CHANOPRIVSNEEDED(_userPtr, (*it).getName());
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 		return ;
 	}
 	else
 	{
-		pr("H");
 		if (channel != arg)
 		{
-			pr("J");
 			if (arg == "+i")
 				(*it).setInviteOnly(true);
 			else if (arg == "-i")
@@ -355,13 +346,11 @@ void Executor::_mode(std::string content)
 			else if (arg != "+o" && arg != "-o" && arg != "+l" && arg != "+k")
 			{
 				msg = ERR_UNKNOWNMODE(_userPtr, (*it).getName(), nextWord(content));
-				pr("R", msg);
 				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			}
 			else if (nextWord(content) == "")
 			{
 				msg = ERR_NEEDMOREPARAMS(_userPtr, arg);
-				pr("K", nextWord(content));
 				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			}
 			else if (arg == "+o")
@@ -412,12 +401,10 @@ void Executor::_mode(std::string content)
 			else
 			{
 				msg = ERR_UNKNOWNMODE(_userPtr, (*it).getName(), nextWord(content));
-				pr("L", msg);
 				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			}
 		}
 	}
-	pr("M");
 }
 
 void Executor::_privmsg(std::string content) {
