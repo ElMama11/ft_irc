@@ -314,8 +314,8 @@ void Executor::_mode(std::string content)
 	}
 	else if ((*it).isOp(_userPtr) == false)
 	{
-		std::cout << "error, you not operator in this channel" << std::endl; // n'est pas operator du channel
-		return ;
+		msg = ERR_CHANOPRIVSNEEDED(_userPtr, (*it).getName());
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 	else
 	{
@@ -333,7 +333,23 @@ void Executor::_mode(std::string content)
 				(*it).setPass("");
 			else if (arg == "-l")
 				(*it).setUserLimits(UINT_MAX);
-			else if (arg != "+o" && arg != "-o" && arg != "+l" && arg != "+k")
+			else if (arg == "-o")
+			{
+				User	*tmp = (*it).getUserByNickname(nextWord(content));
+				if ((*it).isOp(tmp))
+				{
+					(*it).delUser(tmp);
+					(*it).addUser(tmp, false);
+					msg = RPL_MODE(_userPtr, (*it).getName(), "-o", nextWord(content));
+					(*it).sendModeReplyToAll(msg);
+				}
+				else
+				{
+					msg = ERR_USERNOTINCHANNEL(_userPtr, tmp->getNickname(), (*it).getName());
+					send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+				}
+			}
+			else if (arg != "+o" && arg != "+l" && arg != "+k")
 			{
 				msg = ERR_UNKNOWNMODE(_userPtr, (*it).getName(), nextWord(content));
 				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
@@ -357,22 +373,6 @@ void Executor::_mode(std::string content)
 				else
 				{
 					msg = ERR_USERNOTINCHANNEL(_userPtr, user, (*it).getName());
-					send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-				}
-			}
-			else if (arg == "-o")
-			{
-				User	*tmp = (*it).getUserByNickname(nextWord(content));
-				if ((*it).isOp(tmp))
-				{
-					(*it).delUser(tmp);
-					(*it).addUser(tmp, false);
-					msg = RPL_MODE(_userPtr, (*it).getName(), "-o", nextWord(content));
-					(*it).sendModeReplyToAll(msg);
-				}
-				else
-				{
-					msg = ERR_USERNOTINCHANNEL(_userPtr, tmp->getNickname(), (*it).getName());
 					send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 				}
 			}
