@@ -17,7 +17,7 @@
 secure _nick
 verif les pastille d'op quand mode +o
 securiser si USER est tape avant _pass
-verif que qq est un dans un channel avant d'ecrire dedans
+verifier les confirmation quand on set un mdp et des mode.
 
 
 cas ou :

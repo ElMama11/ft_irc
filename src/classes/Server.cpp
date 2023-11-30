@@ -82,7 +82,8 @@ void Server::handle() {
 	sigaction(SIGINT, &sigStruct, NULL);
 
 	_hintlen = sizeof(_hint);
-	int i = 0, j = 0, activity = 0, valread = 0;
+	size_t i = 0;
+	int j = 0, activity = 0, valread = 0;
 	char tmpBuff[4096];
 	while (!progOver) {
 		//Clear buffer & socket set

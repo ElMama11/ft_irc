@@ -28,7 +28,7 @@ Executor::~Executor(void) {
 void Executor::execOPs(void) {
 	size_t size = this->ops.size();
 	std::string msg;
-	for (int i = 0; i < size; i++) {
+	for (size_t i = 0; i < size; i++) {
 		if (_mapping.find(ops[i].type) == _mapping.end()) {
 			msg = ERR_UNKNOWNCOMMAND(_userPtr, ops[i].type);
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
@@ -63,6 +63,7 @@ void Executor::parseBuffer(std::string content) {
 }
 
 void Executor::_cap(std::string content) {
+	(void)(content);
 	return ;
 }
 
@@ -77,8 +78,7 @@ void Executor::_nick(std::string content) {
 }
 
 void Executor::_quit(std::string content) {
-
-	bool endOfChannel = false;
+	(void)(content);
 	std::string msg = ":";
 	msg += _userPtr->getNickname();
 	msg += " QUIT :Connection closed\n";
@@ -234,8 +234,6 @@ void Executor::_createChannel(std::string content) {
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	msg = RPL_ENDOFNAMES(newChan.getName());
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-	// for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); it++)
-	// 	pr((*it).getName());   		Delete channel quand y a plus personne
 }
 
 bool Executor::isChannel(std::string channel)
@@ -366,19 +364,26 @@ void Executor::_privmsg(std::string content) {
 }
 
 void Executor::_sendMessageToChan(std::string content) {
-	std::string chan, msg, reply;
-	chan = strtok(const_cast<char *>(content.c_str()), " ");
-	if (isChannel(chan)) {
+	std::string chanName, msg, reply;
+	Channel *chan;
+	chanName = strtok(const_cast<char *>(content.c_str()), " ");
+	if (isChannel(chanName)) {
+		chan = getChannelByName(chanName);
+		if (chan->isUserAndOpByNickname(_userPtr->getNickname()) == false) {
+			msg = ERR_NOTONCHANNEL(chanName);
+			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+			return;
+		}
 		msg = strtok(0, "");
 		msg = msg.substr(1, msg.size());
-		reply = RPL_PRIVMSG(_userPtr, chan, msg);
+		reply = RPL_PRIVMSG(_userPtr, chanName, msg);
 		for (std::vector<int>::iterator it = _server->client_socket.begin(); it != _server->client_socket.end(); it++) {
 			if (*it && *it != _userPtr->getSocket())
 				send(*it, reply.c_str(), reply.size(), 0);
 		}
 	}
 	else {
-		msg = ERR_NOSUCHCHANNEL(_userPtr, chan);
+		msg = ERR_NOSUCHCHANNEL(_userPtr, chanName);
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }
@@ -410,7 +415,7 @@ void Executor::_sendPrivateMessage(std::string content) {
 void Executor::_kick(std::string content) {
 	std::string chanName, reason, nickToKick, msg;
 	Channel *chan;
-	int i = -1, j = 0, count = 0;
+	int i = -1, j = 0;
 	while (content[++i])
 		if (content[i] == ' ')
 			j++;
@@ -446,7 +451,7 @@ void Executor::_kick(std::string content) {
 void Executor::_topic(std::string content) {
 	std::string chanName, topic, msg;
 	Channel *chan;
-	int i = -1, j = 0, count = 0;
+	int i = -1, j = 0;
 	while (content[++i])
 		if (content[i] == ' ')
 			j++;
