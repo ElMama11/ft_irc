@@ -60,6 +60,7 @@ class	Channel
 		bool			isOpByNickname(std::string nickname);
 		bool			isUserAndOpByNickname(std::string nickname);
 		bool			isUserLeft();
+		std::string		getActiveModes(void);
 
 };
 

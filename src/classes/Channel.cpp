@@ -366,3 +366,19 @@ bool Channel::isUserLeft()
 		return (true);
 	return (false);
 }
+
+std::string	Channel::getActiveModes(void)
+{
+	std::string msg = "";
+	if (_topicRestrictionForOp == true)
+		msg += "t,";
+	if (_inviteOnly == true)
+		msg += "i,";
+	if (_userLimits != UINT_MAX)
+		msg += "l,";
+	if (_pass != "")
+		msg += "k,";
+	if (msg == "")
+		return ("");
+	return (msg.erase(msg.size() - 1));
+}

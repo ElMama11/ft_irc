@@ -252,14 +252,16 @@ bool Executor::isHash(std::string content)
 	return (true);
 }
 
-std::string	Executor::nextWord(std::string::size_type i, std::string content)
+std::string	Executor::nextWord(std::string content)
 {
-	std::string::size_type start = i + 1;
-	std::string::size_type end = i + 1;
+	std::string firstword;
+	std::string secword;
+	std::istringstream iss(content);
 
-	while (content[end] != ' ' && content[end] != 13 && content[end] != '\0')
-		end++;
-	return (content.substr(start, end - start));
+	iss >> firstword >> firstword >> secword;
+	if (firstword == secword)
+		return ("");
+	return (secword);
 }
 
 bool	Executor::isDigit(std::string content)
@@ -273,18 +275,42 @@ bool	Executor::isDigit(std::string content)
 void Executor::_mode(std::string content)
 {
 	std::string	arg;
-	size_t		pos = content.find(' ');
+	std::string msg;
+	std::string channel;
+	std::istringstream iss(content);
+	iss >> channel >> arg;
+	size_t		pos = 0;
+	pos = content.find(' ');
 	std::vector<Channel>::iterator it = _channels.begin();
 
 	std::string	firstWord = content.substr(0, pos);
-	pos = content.find('\r');
-	content = content.substr(0, pos);
-	while (it != _channels.end() && (*it).getName() != firstWord)
-		it++;
-	if (it == _channels.end())
+	pos = content.find(' ');
+	while (it != _channels.end())
 	{
-		std::cout << content << "---error, channel not found" << std::endl; // le channel n'existe pas
+		if ((*it).getName() == firstWord)
+			break;
+		it++;
+	}
+	if (channel == "")
+	{
+		msg = ERR_NEEDMOREPARAMS(_userPtr, "MODE");
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	}
+	else if (it == _channels.end())
+	{
+		msg = ERR_NOSUCHCHANNEL(_userPtr, channel);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 		return ;
+	}
+	else if (arg.empty())
+	{
+		msg = CHANMODES((*it).getActiveModes());
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+	}
+	else if (content == (*it).getName())
+	{
+		msg = RPL_CHANNELMODEIS(_userPtr, (*it).getName(), "");
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 	else if ((*it).isOp(_userPtr) == false)
 	{
@@ -293,59 +319,79 @@ void Executor::_mode(std::string content)
 	}
 	else
 	{
-		std::string::size_type start = 0;
-
-		for (std::string::size_type i = 0; i <= content.length(); i++)
+		if (channel != arg)
 		{
-			if (content[i] == ' ' || i == content.length())
+			if (arg == "+i")
+				(*it).setInviteOnly(true);
+			else if (arg == "-i")
+				(*it).setInviteOnly(false);
+			else if (arg == "+t")
+				(*it).setTopicRestrictionForOp(true);
+			else if (arg == "-t")
+				(*it).setTopicRestrictionForOp(false);
+			else if (arg == "-k")
+				(*it).setPass("");
+			else if (arg == "-l")
+				(*it).setUserLimits(UINT_MAX);
+			else if (arg != "+o" && arg != "-o" && arg != "+l" && arg != "+k")
 			{
-				arg = content.substr(start, i - start);
-				if (arg == "+i")
-					(*it).setInviteOnly(true);
-				else if (arg == "-i")
-					(*it).setInviteOnly(false);
-				else if (arg == "+t")
-					(*it).setTopicRestrictionForOp(true);
-				else if (arg == "-t")
-					(*it).setTopicRestrictionForOp(false);
-				else if (arg == "+k")
-					(*it).setPass(nextWord(i, content));
-				else if (arg == "-k")
-					(*it).setPass("");
-				else if (arg == "+o")
+				msg = ERR_UNKNOWNMODE(_userPtr, (*it).getName(), nextWord(content));
+				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+			}
+			else if (nextWord(content) == "")
+			{
+				msg = ERR_NEEDMOREPARAMS(_userPtr, arg);
+				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+			}
+			else if (arg == "+o")
+			{
+				std::string user = nextWord(content);
+				if ((*it).isUserByNickname(user))
 				{
-					std::string user = nextWord(i, content);
-
-					if ((*it).isUserByNickname(user))
-					{
-						User	*tmp = (*it).getUserByNickname(user);
-						(*it).delUser(tmp);
-						(*it).addUser(tmp, true);
-					}
-					else
-						std::cout << "error, user not found" << std::endl; // l'utilisateur cible n'est pas dans le channel
+					User	*tmp = (*it).getUserByNickname(user);
+					(*it).delUser(tmp);
+					(*it).addUser(tmp, true);
+					msg = RPL_MODE(_userPtr, (*it).getName(), "+o", user);
+					(*it).sendModeReplyToAll(msg);
 				}
-				else if (arg == "-o")
+				else
 				{
-					User	*tmp = (*it).getUserByNickname(nextWord(i, content));
-					if ((*it).isOp(tmp))
-					{
-						(*it).delUser(tmp);
-						(*it).addUser(tmp, false);
-					}
-					else
-						std::cout << "error, user not operator" << std::endl; // l'utilisateur cible n'est pas dans la liste des operator, faire la distinction avec son absence dans le channel ?
+					msg = ERR_USERNOTINCHANNEL(_userPtr, user, (*it).getName());
+					send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 				}
-				else if (arg == "+l")
+			}
+			else if (arg == "-o")
+			{
+				User	*tmp = (*it).getUserByNickname(nextWord(content));
+				if ((*it).isOp(tmp))
 				{
-					if (isDigit(nextWord(i, content)))
-						(*it).setUserLimits(static_cast<unsigned int>(std::atoi(nextWord(i, content).c_str())));
-					else
-						std::cout << "error, num only for user limit" << std::endl;
+					(*it).delUser(tmp);
+					(*it).addUser(tmp, false);
+					msg = RPL_MODE(_userPtr, (*it).getName(), "-o", nextWord(content));
+					(*it).sendModeReplyToAll(msg);
 				}
-				else if (arg == "-l")
-					(*it).setUserLimits(UINT_MAX);
-				start = i + 1;
+				else
+				{
+					msg = ERR_USERNOTINCHANNEL(_userPtr, tmp->getNickname(), (*it).getName());
+					send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+				}
+			}
+			else if (arg == "+l")
+			{
+				if (isDigit(nextWord(content)))
+					(*it).setUserLimits(static_cast<unsigned int>(std::atoi(nextWord(content).c_str())));
+				else
+				{
+					msg = ERR_UNKNOWNMODE(_userPtr, (*it).getName(), nextWord(content));
+					send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+				}
+			}
+			else if (arg == "+k")
+				(*it).setPass(nextWord(content));
+			else
+			{
+				msg = ERR_UNKNOWNMODE(_userPtr, (*it).getName(), nextWord(content));
+				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			}
 		}
 	}
