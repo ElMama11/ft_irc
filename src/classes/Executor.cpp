@@ -601,27 +601,44 @@ void Executor::_invite(std::string content) {
 }
 
 void Executor::_play(std::string content) {
-	std::string msg;
+
+		std::string	msg;
+	std::string nl = "\n";
+	
+	std::string reply;
 	Channel *chan = NULL;
 	if (content.empty() || isOnlySpace(content) == true) {
-		msg = ERR_NEEDMOREPARAMS(_userPtr, "/play");
-		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		reply = ERR_NEEDMOREPARAMS(_userPtr, "/play");
+		send(_userPtr->getSocket(), reply.c_str(), reply.size(), 0);
 		return ;
 	}
 	if (content.find('#') == std::string::npos || content == "#") {
-		msg = ERR_INVALIDCHANNEL(_userPtr, content);
-		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		reply = ERR_INVALIDCHANNEL(_userPtr, content);
+		send(_userPtr->getSocket(), reply.c_str(), reply.size(), 0);
 		return ;
 	}
 	if (isChannel(content))
 		chan = getChannelByName(content);
 	else {
-		msg = ERR_NOSUCHCHANNEL(_userPtr, content);
-		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		reply = ERR_NOSUCHCHANNEL(_userPtr, content);
+		send(_userPtr->getSocket(), reply.c_str(), reply.size(), 0);
 		return ;
-	} 
-	if (chan->isUserAndOpByNickname(_userPtr->getNickname()) == true)
-		chan->sendPlayReplyToAll(chan);
+	}
+	if (chan->isUserAndOpByNickname(_userPtr->getNickname()) == false) {
+		msg = ERR_NOTONCHANNEL(chan->getName());
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
+	else {
+		msg = "   ooo    ";
+		msg += "  ooooo   ";
+		msg += "   ooo    ";
+		msg += "    o     ";
+		msg += "  ooo     ";
+		msg += " o  o     ";
+		msg += "o   o     ";
+		chan->sendPlayReplyToAll(chan, msg, _userPtr);
+	}
 }
 
 Channel *Executor::getChannelByName(std::string channelName) {
@@ -674,76 +691,4 @@ User *Executor::getPrivateUserByNickname(std::string nickName)
 	}
 
 	return (NULL);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-void Play()
-{
-	std::string	msg = "";
-	std::string nl = "\n";
-	
-	for (int i = 0; i < 30; i++)
-		nl += "\n";
-
-	for (int i = 0; i < 20; i++)
-	{
-		msg = nl;
-		msg += "                      ooo                                 \n";
-		msg += "                     ooooo                                \n";
-		msg += "                      ooo                                 \n";
-		msg += "                       o                                  \n";
-		msg += "                     ooo                                  \n";
-		msg += "                    o  o                                  \n";
-		msg += "                   o   o                                  \n";
-		msg += "                       o                                  \n";
-		msg += "                       o                                  \n";
-		msg += "                       oo                                 \n";
-		msg += "                       o o                                \n";
-		msg += "                       o  oo                              \n";
-		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-		usleep(50000);
-
-		msg = nl;
-		msg = "";
-		msg += "                      ooo                                 \n";
-		msg += "                     ooooo                                \n";
-		msg += "                      ooo                                 \n";
-		msg += "                       o                                  \n";
-		msg += "                       o                                  \n";
-		msg += "                       o                                  \n";
-		msg += "                       o                                  \n";
-		msg += "                       o                                  \n";
-		msg += "                       o                                  \n";
-		msg += "                       o                                  \n";
-		msg += "                       o                                  \n";
-		msg += "                       oo                                 \n";
-		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-		usleep(50000);
-
-		msg = nl;
-		msg += "                      ooo                                 \n";
-		msg += "                     ooooo                                \n";
-		msg += "                      ooo                                 \n";
-		msg += "                       o                                  \n";
-		msg += "                       o                                  \n";
-		msg += "                       oo                                 \n";
-		msg += "                       o o                                \n";
-		msg += "                       o                                  \n";
-		msg += "                       o                                  \n";
-		msg += "                      oo                                  \n";
-		msg += "                     o o                                  \n";
-		msg += "                    o  oo                                 \n";
-		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-		usleep(50000);
-	}
 }

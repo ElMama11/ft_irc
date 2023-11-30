@@ -358,16 +358,16 @@ void Channel::sendModeReplyToAll(std::string msg)
 	}
 }
 
-void Channel::sendPlayReplyToAll(Channel *chan)
+void Channel::sendPlayReplyToAll(Channel *chan, std::string msg, User *sender)
 {
-	std::string msg;
+	std::string reply;
 	for (std::vector<User *>::iterator it = chan->_op.begin(); it != chan->_op.end(); it++) {
-		msg = RPL_PRIVMSG((*it), chan->getName(), );
-		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
+		reply = RPL_PRIVMSG(sender, chan->getName(), msg);
+		send((*it)->getSocket(), reply.c_str(), reply.size(), 0);
 	}
 	for (std::vector<User *>::iterator it = chan->_user.begin(); it != chan->_user.end(); it++) {
-		msg = RPL_PRIVMSG((*it), chan->getName(), );
-		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
+		reply = RPL_PRIVMSG(sender, chan->getName(), msg);
+		send((*it)->getSocket(), reply.c_str(), reply.size(), 0);
 	}
 }
 

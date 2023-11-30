@@ -53,7 +53,7 @@ class	Channel
 		void			sendTopicReplyToAll(std::string chanName, std::string topic, Channel *chan);
 		void			sendQuitReplyToAll(std::string msg);
 		void			sendModeReplyToAll(std::string msg);
-		void			sendPlayReplyToAll(Channel *chan);
+		void			sendPlayReplyToAll(Channel *chan, std::string msg, User *sender);
 
 		std::string		getNicknameWithPrefix(User *user);
 		bool			isOp(User *user);
