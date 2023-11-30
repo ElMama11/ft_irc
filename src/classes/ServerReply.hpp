@@ -42,14 +42,14 @@
 /* 443 */ #define ERR_USERONCHANNEL(targetName, channelName) ":" SERV_NAME " 443 " + targetName + " " + channelName + " :is already on channel" + "\n"
 /* 451 */ #define ERR_NOTREGISTERED(client) ":" SERV_NAME " 451 " + client.getNickname() + " :You have not registered" + "\n"
 /* 451 */ #define ERR_NOTREGISTERED_MSG(client, message) ":" SERV_NAME " 451 " + client.getNickname() + " :" + message + "\n"
-/* 461      */ #define ERR_NEEDMOREPARAMS(client, command) ":" SERV_NAME " 461 " + client->getNickname() + " " + command + " :Not enough parameters" + "\n"
+/* 461  */ #define ERR_NEEDMOREPARAMS(client, command) ":" SERV_NAME " 461 " + client->getNickname() + " " + command + " :Not enough parameters" + "\n"
 /* 462 */ #define ERR_TOOMANYPARAMS(command) ":" SERV_NAME " 462 " + command + " :Too many parameters" + "\n"
 /* 463 		*/ #define ERR_ALREADYREGISTRED(clientName) ":" SERV_NAME " 463 " + clientName + " :Already registered" + "\n"
 
 /* 464 */ #define ERR_PASSWDMISMATCH(client) ":" SERV_NAME " 464 " + client->getNickname() + " :Password Incorrect" + "\n"
 
 /* 471 */ #define ERR_CHANNELISFULL(client, channelName) ":" SERV_NAME " 471 " + client->getNickname() + " " + channelName + " :Cannot join channel (+l) - channel is full, try again later" + "\n"
-/* 472 */ #define ERR_UNKNOWNMODE(client, channelName, char) ":" SERV_NAME " 472 " + client.getNickname() + " " + channelName + " " + char + " :is unknown mode char to me for me" + "\n"
+/* 472 */ #define ERR_UNKNOWNMODE(client, channelName, char) ":" SERV_NAME " 472 " + client->getNickname() + " " + channelName + " " + char + " :is unknown mode char to me" + "\n"
 /* 473 */ #define ERR_INVITEONLYCHAN(client, channelName) ":" SERV_NAME " 473 " + client->getNickname() + " " + channelName + " :Cannot join channel (+i) - you must be invited" + "\n"
 /* 475 */ #define ERR_BADCHANNELKEY(client, channelName) ":" SERV_NAME " 475 " + client->getNickname() + " " + channelName + " :Cannot join channel (+k) - bad key" + "\n"
 /* 476 */ #define ERR_BADCHANNELMASK(channelName) ":" SERV_NAME " 476 " + channelName + " :Bad Channel Mask" + "\n"
@@ -61,6 +61,7 @@
 // # define RPL_CREATED(time)  std::string("This server was created ") + time + "\n"
 // # define RPL_MYINFO + "\n"
 // # define RPL_ISUPPORT + "\n"
+# define CHANMODES(modes) "CHANMODES=" + modes + "\n"
 # define RPL_YOUREOPER      std::string("You are now an IRC operator") + "\n"
 
 #define INVITE_MSG(clientName, targetName, chanName) ":" + clientName + " INVITE " + targetName + " " + chanName + "\n"
