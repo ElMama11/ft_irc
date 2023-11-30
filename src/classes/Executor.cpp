@@ -14,6 +14,7 @@ Executor::Executor(Server *ptr) {
 	this->_mapping["PASS"] = &Executor::_pass;
 	this->_mapping["MODE"] = &Executor::_mode;
 	this->_mapping["PRIVMSG"] = &Executor::_privmsg;
+	this->_mapping["privmsg"] = &Executor::_privmsg;
 	this->_mapping["KICK"] = &Executor::_kick;
 	this->_mapping["TOPIC"] = &Executor::_topic;
 	this->_mapping["INVITE"] = &Executor::_invite;
@@ -27,7 +28,7 @@ Executor::~Executor(void) {
 void Executor::execOPs(void) {
 	size_t size = this->ops.size();
 	std::string msg;
-	for (int i = 0; i < size; i++) {
+	for (size_t i = 0; i < size; i++) {
 		if (_mapping.find(ops[i].type) == _mapping.end()) {
 			msg = ERR_UNKNOWNCOMMAND(_userPtr, ops[i].type);
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
@@ -62,17 +63,22 @@ void Executor::parseBuffer(std::string content) {
 }
 
 void Executor::_cap(std::string content) {
+	(void)(content);
 	return ;
 }
 
 void Executor::_nick(std::string content) {
+	// for (std::list<User>::iterator ite = _server->users.begin(); ite != _server->users.end(); ite++) {
+	// 	if((*ite).getNickname() == content) {
+	// 		_server->errorMsg("Same nickname is on the server.", _userPtr->getSocket());
+	// 		return;
+	// 	}
+	// }
 	_userPtr->setNickname(content);
-
 }
 
 void Executor::_quit(std::string content) {
-
-	bool endOfChannel = false;
+	(void)(content);
 	std::string msg = ":";
 	msg += _userPtr->getNickname();
 	msg += " QUIT :Connection closed\n";
@@ -119,8 +125,6 @@ void Executor::_user(std::string content) {
 		this->_userPtr->setRealname(params[3]);
 	std::string msg = RPL_WELCOME(_userPtr);
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-	msg = RPL_YOURHOST(_userPtr);
-	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 }
 
 void	Executor::joinChannel(std::string firstword, Channel *chanToJoin)
@@ -166,8 +170,7 @@ void Executor::_join(std::string content) {
 	if (!isChannel(firstword)) {
 		_createChannel(firstword);
 	}
-	else
-	{
+	else {
 		Channel *chanToJoin = getChannelByName(firstword);
 		if (chanToJoin == NULL) {
 			msg = ERR_NOSUCHCHANNEL(_userPtr, firstword);
@@ -184,8 +187,7 @@ void Executor::_join(std::string content) {
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			return;
 		}
-		else if (chanToJoin->getPass() != "")
-		{
+		else if (chanToJoin->getPass() != "") {
 			int end, start = 0;
 			start = content.find(" ");
 			start++;
@@ -198,21 +200,9 @@ void Executor::_join(std::string content) {
 				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 				return;
 			}
-			else if (chanToJoin->isUserAndOpByNickname(_userPtr->getNickname()))
-			{
-				msg = ERR_USERONCHANNEL(_userPtr->getNickname(), chanToJoin->getName());
-				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-			}
 			else
-			{
 				joinChannel(firstword, chanToJoin);	
-			}
-		}
-		else if (chanToJoin->isUserAndOpByNickname(_userPtr->getNickname()))
-		{
-			msg = ERR_USERONCHANNEL(_userPtr->getNickname(), chanToJoin->getName());
-			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-		}
+		}	//	JOIN WITH GOOD PASSWORD
 		else
 			joinChannel(firstword, chanToJoin);	
 	}
@@ -292,6 +282,7 @@ void Executor::_mode(std::string content)
 	size_t		pos = 0;
 	pos = content.find(' ');
 	std::vector<Channel>::iterator it = _channels.begin();
+
 	std::string	firstWord = content.substr(0, pos);
 	pos = content.find(' ');
 	while (it != _channels.end())
@@ -323,8 +314,7 @@ void Executor::_mode(std::string content)
 	}
 	else if ((*it).isOp(_userPtr) == false)
 	{
-		msg = ERR_CHANOPRIVSNEEDED(_userPtr, (*it).getName());
-		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		std::cout << "error, you not operator in this channel" << std::endl; // n'est pas operator du channel
 		return ;
 	}
 	else
@@ -408,6 +398,11 @@ void Executor::_mode(std::string content)
 }
 
 void Executor::_privmsg(std::string content) {
+	if (content.empty()) {
+		std::string msg = ERR_NEEDMOREPARAMS(_userPtr, "privmsg");
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
 	if (content[0] == '#')
 		_sendMessageToChan(content);
 	else
@@ -415,25 +410,41 @@ void Executor::_privmsg(std::string content) {
 }
 
 void Executor::_sendMessageToChan(std::string content) {
-	std::string chan, msg, reply;
-	chan = strtok(const_cast<char *>(content.c_str()), " ");
-	if (isChannel(chan)) {
+	std::string chanName, msg, reply;
+	Channel *chan;
+	chanName = strtok(const_cast<char *>(content.c_str()), " ");
+	if (isChannel(chanName)) {
+		chan = getChannelByName(chanName);
+		if (chan->isUserAndOpByNickname(_userPtr->getNickname()) == false) {
+			msg = ERR_NOTONCHANNEL(chanName);
+			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+			return;
+		}
 		msg = strtok(0, "");
 		msg = msg.substr(1, msg.size());
-		reply = RPL_PRIVMSG(_userPtr, chan, msg);
+		reply = RPL_PRIVMSG(_userPtr, chanName, msg);
 		for (std::vector<int>::iterator it = _server->client_socket.begin(); it != _server->client_socket.end(); it++) {
 			if (*it && *it != _userPtr->getSocket())
 				send(*it, reply.c_str(), reply.size(), 0);
 		}
 	}
 	else {
-		msg = ERR_NOSUCHCHANNEL(_userPtr, chan);
+		msg = ERR_NOSUCHCHANNEL(_userPtr, chanName);
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }
 
 void Executor::_sendPrivateMessage(std::string content) {
 	std::string msg, reply, nickToSend;
+	int i = -1, j = 0;
+	while (content[++i])
+		if (content[i] == ' ')
+			j++;
+	if (j == 0) {
+		msg = ERR_NEEDMOREPARAMS(_userPtr, "privmsg");
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
 	nickToSend = strtok(const_cast<char *>(content.c_str()), " ");
 	if (isUserByNickname(nickToSend)) {
 		msg = strtok(0, "");
@@ -450,7 +461,7 @@ void Executor::_sendPrivateMessage(std::string content) {
 void Executor::_kick(std::string content) {
 	std::string chanName, reason, nickToKick, msg;
 	Channel *chan;
-	int i = -1, j = 0, count = 0;
+	int i = -1, j = 0;
 	while (content[++i])
 		if (content[i] == ' ')
 			j++;
@@ -486,7 +497,7 @@ void Executor::_kick(std::string content) {
 void Executor::_topic(std::string content) {
 	std::string chanName, topic, msg;
 	Channel *chan;
-	int i = -1, j = 0, count = 0;
+	int i = -1, j = 0;
 	while (content[++i])
 		if (content[i] == ' ')
 			j++;
@@ -505,7 +516,7 @@ void Executor::_topic(std::string content) {
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 	else {
-		if (chan->isOp(_userPtr) == false) {
+		if (chan->isOp(_userPtr) == false && chan->getTopicRestrictionForOp() == false) {
 			msg = ERR_CHANOPRIVSNEEDED(_userPtr, chanName);
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			return;

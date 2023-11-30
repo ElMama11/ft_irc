@@ -82,7 +82,8 @@ void Server::handle() {
 	sigaction(SIGINT, &sigStruct, NULL);
 
 	_hintlen = sizeof(_hint);
-	int i = 0, j = 0, activity = 0, valread = 0;
+	size_t i = 0;
+	int j = 0, activity = 0, valread = 0;
 	char tmpBuff[4096];
 	while (!progOver) {
 		//Clear buffer & socket set
@@ -104,7 +105,7 @@ void Server::handle() {
 					close(*it);
 			throw sigintReceived();
 		}
-		if ((activity < 0) && (errno != EINTR))
+		if ((activity < 0))
 			std::cerr << "Error: select()" << std::endl;
 		//If something happened on the master socket, then its an incoming connection else its some IO operation on some other socket 
 		_acceptIncomingConnection();
