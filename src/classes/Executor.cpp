@@ -19,6 +19,8 @@ Executor::Executor(Server *ptr) {
 	this->_mapping["KICK"] = &Executor::_kick;
 	this->_mapping["TOPIC"] = &Executor::_topic;
 	this->_mapping["INVITE"] = &Executor::_invite;
+	this->_mapping["play"] = &Executor::_play;
+	this->_mapping["PLAY"] = &Executor::_play;
 	return ;
 }
 
@@ -596,6 +598,30 @@ void Executor::_invite(std::string content) {
 	send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 	msg = RPL_INVITE_RCV(_userPtr, chanName, nickToInvite);
 	send(userToInvite->getSocket(), msg.c_str(), msg.size(), 0);
+}
+
+void Executor::_play(std::string content) {
+	std::string msg;
+	Channel *chan = NULL;
+	if (content.empty() || isOnlySpace(content) == true) {
+		msg = ERR_NEEDMOREPARAMS(_userPtr, "/play");
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return ;
+	}
+	if (content.find('#') == std::string::npos || content == "#") {
+		msg = ERR_INVALIDCHANNEL(_userPtr, content);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return ;
+	}
+	if (isChannel(content))
+		chan = getChannelByName(content);
+	else {
+		msg = ERR_NOSUCHCHANNEL(_userPtr, content);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return ;
+	} 
+	if (chan->isUserAndOpByNickname(_userPtr->getNickname()) == true)
+		chan->sendPlayReplyToAll(chan);
 }
 
 Channel *Executor::getChannelByName(std::string channelName) {
