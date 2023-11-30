@@ -2,6 +2,7 @@
 #include "Channel.hpp"
 #include "../pr.cpp"
 #include <limits.h>
+#include <unistd.h>
 
 Executor::Executor(Server *ptr) {
 	this->_server = ptr;
@@ -606,4 +607,76 @@ User *Executor::getPrivateUserByNickname(std::string nickName)
 	}
 
 	return (NULL);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+void Play()
+{
+	std::string	msg = "";
+	std::string nl = "\n";
+	
+	for (int i = 0; i < 30; i++)
+		nl += "\n";
+
+	for (int i = 0; i < 20; i++)
+	{
+		msg = nl;
+		msg += "                      ooo                                 \n";
+		msg += "                     ooooo                                \n";
+		msg += "                      ooo                                 \n";
+		msg += "                       o                                  \n";
+		msg += "                     ooo                                  \n";
+		msg += "                    o  o                                  \n";
+		msg += "                   o   o                                  \n";
+		msg += "                       o                                  \n";
+		msg += "                       o                                  \n";
+		msg += "                       oo                                 \n";
+		msg += "                       o o                                \n";
+		msg += "                       o  oo                              \n";
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		usleep(50000);
+
+		msg = nl;
+		msg = "";
+		msg += "                      ooo                                 \n";
+		msg += "                     ooooo                                \n";
+		msg += "                      ooo                                 \n";
+		msg += "                       o                                  \n";
+		msg += "                       o                                  \n";
+		msg += "                       o                                  \n";
+		msg += "                       o                                  \n";
+		msg += "                       o                                  \n";
+		msg += "                       o                                  \n";
+		msg += "                       o                                  \n";
+		msg += "                       o                                  \n";
+		msg += "                       oo                                 \n";
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		usleep(50000);
+
+		msg = nl;
+		msg += "                      ooo                                 \n";
+		msg += "                     ooooo                                \n";
+		msg += "                      ooo                                 \n";
+		msg += "                       o                                  \n";
+		msg += "                       o                                  \n";
+		msg += "                       oo                                 \n";
+		msg += "                       o o                                \n";
+		msg += "                       o                                  \n";
+		msg += "                       o                                  \n";
+		msg += "                      oo                                  \n";
+		msg += "                     o o                                  \n";
+		msg += "                    o  oo                                 \n";
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		usleep(50000);
+	}
 }
