@@ -1,5 +1,5 @@
 GCC = g++
-FLAGS = -std=c++98 -g #-Wall -Wextra -Werror 
+FLAGS = -std=c++98 -g -Wall -Wextra -Werror 
 
 NAME = ircserv
 

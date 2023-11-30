@@ -44,14 +44,15 @@ void Executor::execOPs(void) {
 void Executor::parseBuffer(std::string content) {
 	std::istringstream iss(content);
 	std::string tmp;
-	int pos = 0;
+	unsigned int pos = 0;
 
 	if (!(this->ops.empty())) {
 		this->ops.clear();
 	}
 	while (std::getline(iss, tmp, '\n')) {
 		int splitter = tmp.find(' ');
-		if (pos = tmp.find('\r'))
+		pos = tmp.find('\r');
+		if (pos != std::string::npos)
 			tmp = tmp.substr(0, pos);
 		std::string type = tmp.substr(0, splitter);
 		OP op = {
