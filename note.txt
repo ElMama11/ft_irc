@@ -4,5 +4,3 @@ verifier les confirmation quand on set un mdp et des mode.
 crash sur MODE #s mama1 +o
 Si join auqnd chan a un mdp + invit only, ca demande une invit meme avec le mdp
 
-cas ou :
-client rejoint un channel ou il est deja

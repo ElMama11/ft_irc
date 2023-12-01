@@ -1,5 +1,4 @@
 #include "Channel.hpp"
-#include "limits.h"
 #include "../pr.cpp"
 
 Channel::Channel(std::string chanName, User *userPtr) {
@@ -8,7 +7,7 @@ Channel::Channel(std::string chanName, User *userPtr) {
 			_name += chanName[i];
 	_topicRestrictionForOp = false;
 	_inviteOnly = false;
-	_userLimits = UINT_MAX;
+	_userLimits = 0;
 	_topic = "";
 	_pass = "";
 	addUser(userPtr, true);
@@ -399,7 +398,7 @@ std::string	Channel::getActiveModes(void)
 		msg += "t,";
 	if (_inviteOnly == true)
 		msg += "i,";
-	if (_userLimits != UINT_MAX)
+	if (_userLimits != 0)
 		msg += "l,";
 	if (_pass != "")
 		msg += "k,";

@@ -210,7 +210,7 @@ void Executor::_join(std::string content) {
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			return;
 		}
-		else if (chanToJoin->countUsersInChannel() >= chanToJoin->getUserLimits()) {
+		else if (chanToJoin->countUsersInChannel() >= chanToJoin->getUserLimits() && chanToJoin->getUserLimits() != 0) {
 			msg = ERR_CHANNELISFULL(_userPtr, firstword);
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			return;
@@ -364,7 +364,7 @@ void Executor::_mode(std::string content)
 			else if (arg == "-k")
 				(*it).setPass("");
 			else if (arg == "-l")
-				(*it).setUserLimits(UINT_MAX);
+				(*it).setUserLimits(0);
 			else if (arg == "-o")
 			{
 				User	*tmp = (*it).getUserByNickname(nextWord(content));
