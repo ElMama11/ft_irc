@@ -20,5 +20,3 @@ securiser si USER est tape avant _pass
 verifier les confirmation quand on set un mdp et des mode.
 
 
-cas ou :
-client rejoint un channel ou il est deja
