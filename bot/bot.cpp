@@ -9,8 +9,10 @@
 #include <netdb.h>
 #include <sstream>
 #include <cctype>
+#include <signal.h>
 
-
+struct addrinfo	*res = NULL;
+bool			progOver = false;
 
 int	parsing(int ac, char **av)
 {
@@ -48,7 +50,7 @@ int	createSocket(char **av)
 	std::string channel(av[3]);
 
 	struct addrinfo    hints;
-    struct addrinfo		*res = NULL;
+  
     int                connectSocket;
 
     memset(&hints, 0, sizeof(hints));
@@ -58,6 +60,7 @@ int	createSocket(char **av)
     if (getaddrinfo("localhost", av[1], &hints, &res))
     {
         std::cerr << "Can't get addr\n";
+		freeaddrinfo(res);
         return -1;
     }
     connectSocket = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
@@ -205,11 +208,19 @@ void	play(int socket, std::string channel)
 	}
 }
 
-
-
+void sigHandler(int signal)
+{
+	if (signal == SIGINT)
+		progOver = true;
+}
 
 void	bot(int socket, char **av)
 {
+	struct sigaction sigStruct;
+	sigStruct.sa_handler = sigHandler;
+	sigemptyset(&sigStruct.sa_mask);
+	sigStruct.sa_flags = 0;
+	sigaction(SIGINT, &sigStruct, NULL);
 	std::string password(av[2]);
 	std::string channel(av[3]);
 	char	buff[4096];
@@ -218,18 +229,26 @@ void	bot(int socket, char **av)
 	std::string msg = "PASS " + password + "\n";
 	std::cout << msg << std::endl;
 	send(socket, msg.c_str(), msg.size(), 0);
-	msg = "NICK Bot\n";
+	msg = "NICK bot\n";
 	std::cout << msg << std::endl;
 	send(socket, msg.c_str(), msg.size(), 0);
 	msg = "USER Bot\n";
 	send(socket, msg.c_str(), msg.size(), 0);
 	msg = "JOIN " + channel + "\n";
 	send(socket, msg.c_str(), msg.size(), 0);
-	while (1)
+	while (!progOver)
 	{
 		memset(buff, 0, 4096);
 		if (recv(socket, buff, 4096, 0) == 0)
 			return ;
+		if (progOver)
+		{
+			msg = "QUIT\n";
+			send(socket, msg.c_str(), msg.size(), 0);
+			close(socket);
+			freeaddrinfo(res);
+			return ;
+		}
 		std::istringstream iss(buff);
 		while (iss >> tmp)
 		{

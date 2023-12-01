@@ -1,6 +1,0 @@
-
-verif les pastille d'op quand mode +o
-verifier les confirmation quand on set un mdp et des mode.
-crash sur MODE #s mama1 +o
-Si join auqnd chan a un mdp + invit only, ca demande une invit meme avec le mdp
-
