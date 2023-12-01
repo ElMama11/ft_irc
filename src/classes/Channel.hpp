@@ -54,7 +54,7 @@ class	Channel
 		void			sendQuitReplyToAll(std::string msg);
 		void			sendModeReplyToAll(std::string msg);
 		void			sendPlayReplyToAll(Channel *chan, std::string msg, User *sender);
-		void			sendPrivmsgReplyToChan(Channel *chan, std::string reply);
+		void			sendPrivmsgReplyToChan(Channel *chan, std::string reply, int socketSender);
 
 		std::string		getNicknameWithPrefix(User *user);
 		bool			isOp(User *user);

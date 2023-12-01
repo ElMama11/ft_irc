@@ -455,13 +455,9 @@ void Executor::_sendMessageToChan(std::string content) {
 			return;
 		}
 		msg = strtok(0, "");
-		msg = msg.substr(1, msg.size());
+ 		msg = msg.substr(1, msg.size());
 		reply = RPL_PRIVMSG(_userPtr, chanName, msg);
-		//chan->sendPrivmsgReplyToChan(chan, msg);
-		for (std::vector<int>::iterator it = _server->client_socket.begin(); it != _server->client_socket.end(); it++) {
-			if (*it && *it != _userPtr->getSocket())
-				send(*it, reply.c_str(), reply.size(), 0);
-		}
+		chan->sendPrivmsgReplyToChan(chan, reply, _userPtr->getSocket());
 	}
 	else {
 		msg = ERR_NOSUCHCHANNEL(_userPtr, chanName);

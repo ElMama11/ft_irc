@@ -371,13 +371,15 @@ void Channel::sendPlayReplyToAll(Channel *chan, std::string msg, User *sender)
 	}
 }
 
-void Channel::sendPrivmsgReplyToChan(Channel *chan, std::string reply)
+void Channel::sendPrivmsgReplyToChan(Channel *chan, std::string reply, int socketSender)
 {
 	for (std::vector<User *>::iterator it = chan->_op.begin(); it != chan->_op.end(); it++) {
-		send((*it)->getSocket(), reply.c_str(), reply.size(), 0);
+		if ((*it)->getSocket() != socketSender)
+			send((*it)->getSocket(), reply.c_str(), reply.size(), 0);
 	}
 	for (std::vector<User *>::iterator it = chan->_user.begin(); it != chan->_user.end(); it++) {
-		send((*it)->getSocket(), reply.c_str(), reply.size(), 0);
+		if ((*it)->getSocket() != socketSender)
+			send((*it)->getSocket(), reply.c_str(), reply.size(), 0);
 	}
 }
 
