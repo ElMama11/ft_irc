@@ -371,6 +371,16 @@ void Channel::sendPlayReplyToAll(Channel *chan, std::string msg, User *sender)
 	}
 }
 
+void Channel::sendPrivmsgReplyToChan(Channel *chan, std::string reply)
+{
+	for (std::vector<User *>::iterator it = chan->_op.begin(); it != chan->_op.end(); it++) {
+		send((*it)->getSocket(), reply.c_str(), reply.size(), 0);
+	}
+	for (std::vector<User *>::iterator it = chan->_user.begin(); it != chan->_user.end(); it++) {
+		send((*it)->getSocket(), reply.c_str(), reply.size(), 0);
+	}
+}
+
 bool Channel::isUserLeft()
 {
 	for (std::vector<User *>::iterator it = _op.begin(); it != _op.end(); it++)

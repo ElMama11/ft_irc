@@ -5,7 +5,6 @@
 bool progOver = false;
 
 Server::Server(const char *ip, int port, int address_family, int type, std::string password) {
-		std::cout << "Server constructor." << std::endl;
 		FD_ZERO(&_readfds);
 		_hintlen = 0;
 		_executor = new Executor(this);
@@ -20,7 +19,6 @@ Server::Server(const char *ip, int port, int address_family, int type, std::stri
 	};
 
 Server::~Server() {
-	std::cout << "Server destructor." << std::endl;
 	delete _executor;
 }
 
@@ -30,7 +28,6 @@ void Server::init() {
 	this->serverSocket = socket(_address_family, _type, 0);
 	if (this->serverSocket == -1)
 		throw createSocketError();
-	std::cout << "INIT OK" << std::endl;
 	_handleMultiplesConnection();
 }
 
@@ -38,8 +35,6 @@ void Server::socBind() {
 	_hint.sin_family = _address_family;
 	_hint.sin_port = htons(_port);
 	_hint.sin_addr.s_addr = INADDR_ANY;
-	//inet_pton(this->address_family, this->ip, &(this->hint.sin_addr));
-	//this->hint.sin_addr = inet_addr(this->ip);				// inutile ?
 	if (bind(this->serverSocket, (sockaddr*)&(_hint), sizeof(_hint)) == -1)
 		throw bindSocketError();
 	std::cout << "Bind ok, listener on port " << _port << std::endl;
@@ -48,7 +43,6 @@ void Server::socBind() {
 void Server::mark() {
 	if (listen(this->serverSocket, SOMAXCONN) < 0)
 		throw markSocketError();
-	std::cout << "MARK OK" << std::endl;
 }
 
 

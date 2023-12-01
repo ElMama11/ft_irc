@@ -4,7 +4,7 @@
 
 
 int main(int ac, char **av) {
-	if (ac != 3) {
+	if (ac != 3 || av[1][0] == '\0' || av[2][0] == '\0' || !(isdigit(av[1][0]))) {
 		std::cerr << "USAGE : ./ircserv <port> <password>" << std::endl;
 		exit(EXIT_FAILURE);
 	}
