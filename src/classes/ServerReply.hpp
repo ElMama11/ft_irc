@@ -40,7 +40,7 @@
 /* 441 */ #define ERR_USERNOTINCHANNEL(client, targetName, channelName) ":" SERV_NAME " 441 " + client->getNickname() + " " + channelName + " " + targetName + " :They aren't on that channel" + "\n"
 /* 442 */ #define ERR_NOTONCHANNEL(channelName) channelName + " :You're not on that channel" + "\n"
 /* 443 */ #define ERR_USERONCHANNEL(targetName, channelName) ":" SERV_NAME " 443 " + targetName + " " + channelName + " :is already on channel" + "\n"
-/* 451 */ #define ERR_NOTREGISTERED(client) ":" SERV_NAME " 451 " + client.getNickname() + " :You have not registered" + "\n"
+/* 451 */ #define ERR_NOTREGISTERED(client) ":" SERV_NAME " 451 " + client + " :You have not registered" + "\n"
 /* 451 */ #define ERR_NOTREGISTERED_MSG(client, message) ":" SERV_NAME " 451 " + client.getNickname() + " :" + message + "\n"
 /* 461  */ #define ERR_NEEDMOREPARAMS(client, command) ":" SERV_NAME " 461 " + client->getNickname() + " " + command + " :Not enough parameters" + "\n"
 /* 462 */ #define ERR_TOOMANYPARAMS(command) ":" SERV_NAME " 462 " + command + " :Too many parameters" + "\n"

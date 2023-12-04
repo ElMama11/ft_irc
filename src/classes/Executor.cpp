@@ -192,6 +192,13 @@ void Executor::_join(std::string content) {
 
 	std::string firstword;
 	std::istringstream iss(content);
+
+	if (_userPtr->getNickname().empty() || _userPtr->getUsername().empty()) {
+		std::string rep = " ";
+		msg = ERR_NOTREGISTERED(rep);
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
 	iss >> firstword;
 
 	if (firstword.find('#') == std::string::npos || firstword == "#") {
