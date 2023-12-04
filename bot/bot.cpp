@@ -229,23 +229,20 @@ void	bot(int socket, char **av)
 	std::string msg = "PASS " + password + "\n";
 	std::cout << msg << std::endl;
 	send(socket, msg.c_str(), msg.size(), 0);
-	msg = "NICK bot\n";
+	msg = "NICK bot541\t\n";
 	std::cout << msg << std::endl;
 	send(socket, msg.c_str(), msg.size(), 0);
-	msg = "USER Bot\n";
+	msg = "USER bot541\t\n";
 	send(socket, msg.c_str(), msg.size(), 0);
 	msg = "JOIN " + channel + "\n";
 	send(socket, msg.c_str(), msg.size(), 0);
-	sleep(1);
 	while (!progOver)
 	{
 		memset(buff, 0, 4096);
 		if (recv(socket, buff, 4096, 0) == 0) {
 			return ;
-		}
-			
-		std::cout << "-- " << buff << std::endl;
-		if (progOver || strcmp(buff, ":ft_irc 433 * bot :Nickname is already in use\r\n") == 0)
+		}		
+		if (progOver)
 		{
 			msg = "QUIT\n";
 			send(socket, msg.c_str(), msg.size(), 0);
