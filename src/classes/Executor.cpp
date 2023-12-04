@@ -45,7 +45,7 @@ void Executor::execOPs(void) {
 void Executor::parseBuffer(std::string content) {
 	std::istringstream iss(content);
 	std::string tmp;
-	unsigned int pos = 0;
+	std::string::size_type pos = 0;
 
 	if (!(this->ops.empty())) {
 		this->ops.clear();
