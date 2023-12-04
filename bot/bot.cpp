@@ -236,12 +236,16 @@ void	bot(int socket, char **av)
 	send(socket, msg.c_str(), msg.size(), 0);
 	msg = "JOIN " + channel + "\n";
 	send(socket, msg.c_str(), msg.size(), 0);
+	sleep(1);
 	while (!progOver)
 	{
 		memset(buff, 0, 4096);
-		if (recv(socket, buff, 4096, 0) == 0)
+		if (recv(socket, buff, 4096, 0) == 0) {
 			return ;
-		if (progOver)
+		}
+			
+		std::cout << "-- " << buff << std::endl;
+		if (progOver || strcmp(buff, ":ft_irc 433 * bot :Nickname is already in use\r\n") == 0)
 		{
 			msg = "QUIT\n";
 			send(socket, msg.c_str(), msg.size(), 0);
