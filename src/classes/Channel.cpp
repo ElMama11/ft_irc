@@ -1,5 +1,4 @@
 #include "Channel.hpp"
-#include "../pr.cpp"
 
 Channel::Channel(std::string chanName, User *userPtr) {
 	for (std::string::size_type i = 0; i < chanName.length(); i++)

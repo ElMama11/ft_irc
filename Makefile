@@ -1,4 +1,4 @@
-GCC = g++
+GCC = c++
 FLAGS = -std=c++98 -g -Wall -Wextra -Werror 
 
 NAME = ircserv
@@ -13,7 +13,7 @@ PATHSRC = src/
 
 HEAD =   src/classes/Server.hpp src/classes/User.hpp src/classes/Executor.hpp src/classes/Channel.hpp
 
-FILES = main.cpp pr.cpp classes/Server.cpp classes/User.cpp classes/Executor.cpp classes/Channel.cpp
+FILES = main.cpp classes/Server.cpp classes/User.cpp classes/Executor.cpp classes/Channel.cpp
 
 SRCS = $(addprefix $(PATHSRC)/,$(FILES))
 
@@ -45,11 +45,16 @@ $(PATHOBJ)/%.o: $(PATHSRC)/%.cpp $(DEP)
 clean:
 	@$(ECHO) "All $(RED).o$(DEFAULT) are now deleted for $(NAME)."
 	@rm -rf $(PATHOBJ)
-
+	@rm -rf obj/bot.o
+	
 fclean: clean
 	@$(ECHO) "$(RED)$(NAME)$(DEFAULT) is now deleted."
 	@rm -rf $(NAME)
+	@rm -rf bot/bot
 
 re: fclean all
 
-.PHONY: all clean fclean re
+bot:
+	@$(MAKE) -C bot
+
+.PHONY: all clean fclean re bot
