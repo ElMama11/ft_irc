@@ -90,7 +90,7 @@ void	play(int socket, std::string channel)
 
 	for (int i = 0; i < 5; i++)
 	{
-		for (int i = 0; i < 120; i++)
+		for (int i = 0; i < 16; i++)
 			send(socket, nl.c_str(), nl.size(), 0);
 
 		msg = "PRIVMSG " + channel + " :     ooo    \n";
@@ -119,7 +119,7 @@ void	play(int socket, std::string channel)
 		send(socket, msg.c_str(), msg.size(), 0);
 		usleep(400000);
 
-		for (int n = 0; n < 120; n++)
+		for (int n = 0; n < 16 ; n++)
 			send(socket, nl.c_str(), nl.size(), 0);
 
 		msg = "PRIVMSG " + channel + " :    ooo  \n";
@@ -148,7 +148,7 @@ void	play(int socket, std::string channel)
 		send(socket, msg.c_str(), msg.size(), 0);
 		usleep(400000);
 
-		for (int n = 0; n < 120; n++)
+		for (int n = 0; n < 16; n++)
 			send(socket, nl.c_str(), nl.size(), 0);
 
 		msg = "PRIVMSG " + channel + " :   ooo  \n";
@@ -177,7 +177,7 @@ void	play(int socket, std::string channel)
 		send(socket, msg.c_str(), msg.size(), 0);
 		usleep(400000);
 
-		for (int n = 0; n < 120; n++)
+		for (int n = 0; n < 16; n++)
 			send(socket, nl.c_str(), nl.size(), 0);
 
 		msg = "PRIVMSG " + channel + " :    ooo   \n";
