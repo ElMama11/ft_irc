@@ -375,30 +375,42 @@ void Executor::_mode(std::string content)
 				(*it).setPass("");
 			else if (arg == "-l")
 				(*it).setUserLimits(0);
+			else if (nextWord(content) == "")
+			{
+				msg = ERR_NEEDMOREPARAMS(_userPtr, arg);
+				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+			}
 			else if (arg == "-o")
 			{
 				User	*tmp = (*it).getUserByNickname(nextWord(content));
-				if ((*it).isOp(tmp))
+				if (tmp == NULL)
+				{
+
+					msg = ERR_NOSUCHNICK(_userPtr, nextWord(content));
+					send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+					return ;
+				}
+				else if ((*it).isOp(tmp))
 				{
 					(*it).delUser(tmp);
 					(*it).addUser(tmp, false);
 					msg = RPL_MODE(_userPtr, (*it).getName(), "-o", nextWord(content));
 					(*it).sendModeReplyToAll(msg);
 				}
+				else if ((*it).isUserByNickname(tmp->getNickname()))
+				{
+					msg = ERR_NOSUCHNICK(_userPtr, tmp->getNickname());
+					send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+				}
 				else
 				{
-					msg = ERR_USERNOTINCHANNEL(_userPtr, tmp->getNickname(), (*it).getName());
+					msg = ERR_USERNOTINCHANNEL(_userPtr, nextWord(content), (*it).getName());
 					send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 				}
 			}
 			else if (arg != "+o" && arg != "+l" && arg != "+k")
 			{
 				msg = ERR_UNKNOWNMODE(_userPtr, (*it).getName(), nextWord(content));
-				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
-			}
-			else if (nextWord(content) == "")
-			{
-				msg = ERR_NEEDMOREPARAMS(_userPtr, arg);
 				send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			}
 			else if (arg == "+o")
