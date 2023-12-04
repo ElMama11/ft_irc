@@ -70,6 +70,10 @@ void Executor::_cap(std::string content) {
 
 void Executor::_nick(std::string content) {
 	std::string msg;
+	if (_userPtr->checkPassword == false) {
+		_pass("");
+		return;
+	}
 	if (content.find('#') != std::string::npos || content.find(':') != std::string::npos) {
 		msg =  ERR_ERRONEUSNICKNAME(content);
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
