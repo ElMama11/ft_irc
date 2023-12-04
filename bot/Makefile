@@ -1,19 +1,19 @@
-GCC = g++
+GCC = c++
 FLAGS = -std=c++98 -g -Wall -Wextra -Werror 
 
-NAME = ircserv
+NAME = bot
 
 GREEN       = \033[32m
 RED         = \033[31m
 DEFAULT     = \033[37m
 
-PATHOBJ = obj/
+PATHOBJ = ../obj/
 
-PATHSRC = src/
+PATHSRC = .
 
-HEAD =   src/classes/Server.hpp src/classes/User.hpp src/classes/Executor.hpp src/classes/Channel.hpp
+HEAD =   
 
-FILES = main.cpp classes/Server.cpp classes/User.cpp classes/Executor.cpp classes/Channel.cpp
+FILES = bot.cpp
 
 SRCS = $(addprefix $(PATHSRC)/,$(FILES))
 
@@ -30,8 +30,7 @@ endif
 all: $(NAME)
 
 $(PATHOBJ):
-	@mkdir -p obj
-	@mkdir -p obj/classes
+	@mkdir -p ../obj
 
 $(NAME): $(DEP) $(SRCS) $(PATHOBJ) $(OBJ)
 	@$(ECHO) "\r$(GREEN) The .o from $(NAME) are compiled.$(DEFAULT)"
@@ -45,16 +44,11 @@ $(PATHOBJ)/%.o: $(PATHSRC)/%.cpp $(DEP)
 clean:
 	@$(ECHO) "All $(RED).o$(DEFAULT) are now deleted for $(NAME)."
 	@rm -rf $(PATHOBJ)
-	@rm -rf obj/bot.o
-	
+
 fclean: clean
 	@$(ECHO) "$(RED)$(NAME)$(DEFAULT) is now deleted."
 	@rm -rf $(NAME)
-	@rm -rf bot/bot
 
 re: fclean all
 
-bot:
-	@$(MAKE) -C bot
-
-.PHONY: all clean fclean re bot
+.PHONY: all clean fclean re
