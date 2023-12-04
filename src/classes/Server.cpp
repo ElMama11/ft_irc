@@ -1,6 +1,5 @@
 #include "Server.hpp"
 #include <signal.h>
-#include "../pr.cpp"
 
 bool progOver = false;
 

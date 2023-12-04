@@ -229,10 +229,10 @@ void	bot(int socket, char **av)
 	std::string msg = "PASS " + password + "\n";
 	std::cout << msg << std::endl;
 	send(socket, msg.c_str(), msg.size(), 0);
-	msg = "NICK bot\n";
+	msg = "NICK bot\t\n";
 	std::cout << msg << std::endl;
 	send(socket, msg.c_str(), msg.size(), 0);
-	msg = "USER Bot\n";
+	msg = "USER Bot\t\n";
 	send(socket, msg.c_str(), msg.size(), 0);
 	msg = "JOIN " + channel + "\n";
 	send(socket, msg.c_str(), msg.size(), 0);
