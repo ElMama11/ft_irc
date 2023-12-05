@@ -11,6 +11,8 @@
 #include <cctype>
 #include <signal.h>
 
+int	nlNb = 30;
+
 struct addrinfo	*res = NULL;
 bool			progOver = false;
 
@@ -90,7 +92,7 @@ void	play(int socket, std::string channel)
 
 	for (int i = 0; i < 5; i++)
 	{
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < nlNb; i++)
 			send(socket, nl.c_str(), nl.size(), 0);
 
 		msg = "PRIVMSG " + channel + " :     ooo    \n";
@@ -119,7 +121,7 @@ void	play(int socket, std::string channel)
 		send(socket, msg.c_str(), msg.size(), 0);
 		usleep(400000);
 
-		for (int n = 0; n < 16 ; n++)
+		for (int n = 0; n < nlNb ; n++)
 			send(socket, nl.c_str(), nl.size(), 0);
 
 		msg = "PRIVMSG " + channel + " :    ooo  \n";
@@ -148,7 +150,7 @@ void	play(int socket, std::string channel)
 		send(socket, msg.c_str(), msg.size(), 0);
 		usleep(400000);
 
-		for (int n = 0; n < 16; n++)
+		for (int n = 0; n < nlNb; n++)
 			send(socket, nl.c_str(), nl.size(), 0);
 
 		msg = "PRIVMSG " + channel + " :   ooo  \n";
@@ -177,7 +179,7 @@ void	play(int socket, std::string channel)
 		send(socket, msg.c_str(), msg.size(), 0);
 		usleep(400000);
 
-		for (int n = 0; n < 16; n++)
+		for (int n = 0; n < nlNb; n++)
 			send(socket, nl.c_str(), nl.size(), 0);
 
 		msg = "PRIVMSG " + channel + " :    ooo   \n";
@@ -227,10 +229,8 @@ void	bot(int socket, char **av)
 	std::string tmp = "";
 
 	std::string msg = "PASS " + password + "\n";
-	std::cout << msg << std::endl;
 	send(socket, msg.c_str(), msg.size(), 0);
 	msg = "NICK bot\t\n";
-	std::cout << msg << std::endl;
 	send(socket, msg.c_str(), msg.size(), 0);
 	msg = "USER Bot\t\n";
 	send(socket, msg.c_str(), msg.size(), 0);
@@ -244,13 +244,13 @@ void	bot(int socket, char **av)
 			return ;
 		}
 			
-		std::cout << "-- " << buff << std::endl;
 		if (progOver || strcmp(buff, ":ft_irc 433 * bot :Nickname is already in use\r\n") == 0)
 		{
 			msg = "QUIT\n";
 			send(socket, msg.c_str(), msg.size(), 0);
 			close(socket);
 			freeaddrinfo(res);
+			std::cout << "\rProgram terminated" << std::endl;
 			return ;
 		}
 		std::istringstream iss(buff);

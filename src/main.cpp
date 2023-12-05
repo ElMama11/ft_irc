@@ -4,8 +4,6 @@
 
 
 int main(int ac, char **av) {
-	for (int i = 0; av[i]; i++)
-		std::cout << av[i] << std::endl;
 	if (ac != 3 || av[1][0] == '\0' || av[2][0] == '\0' || !(isdigit(av[1][0])) || std::strlen(av[1]) > 5) {
 		std::cerr << "USAGE : ./ircserv <port> <password>" << std::endl;
 		exit(EXIT_FAILURE);

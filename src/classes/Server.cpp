@@ -36,7 +36,6 @@ void Server::socBind() {
 	_hint.sin_addr.s_addr = INADDR_ANY;
 	if (bind(this->serverSocket, (sockaddr*)&(_hint), sizeof(_hint)) == -1)
 		throw bindSocketError();
-	std::cout << "Bind ok, listener on port " << _port << std::endl;
 }
 
 void Server::mark() {
@@ -56,7 +55,6 @@ int Server::awaitForConnection() {
 		std::cerr << "Problem with the client connecting" << std::endl;
 		return -4;
 	}
-	this->_logConnection();
 	return clientSocket;
 }
 
@@ -113,7 +111,6 @@ void Server::handle() {
 					for (j = 0; _executor->getUserPtr()->buffer[j] != '\0'; j++);
 					strcpy(_executor->getUserPtr()->buffer + j, tmpBuff);
 					if (_executor->getUserPtr()->findNl(_executor->getUserPtr()->buffer)) {
-						std::cout << _executor->getUserPtr()->buffer << std::flush;
 						_executor->parseBuffer(_executor->getUserPtr()->buffer);
 						memset(_executor->getUserPtr()->buffer, 0, 4096);
 						_executor->execOPs();
@@ -160,17 +157,6 @@ void Server::cleanAnUser(int userSocket) {
 	}
 	close(userSocket);
 }
-/* PRIVATE FUNCTIONS */
-
-void Server::_logConnection() {
-	int result = getnameinfo((sockaddr*)&(_client), sizeof(_client), _host, NI_MAXHOST, _service, NI_MAXSERV, 0);
-	if (result)
-		std::cout << _host << " connected on " << _service << std::endl;
-	else {
-		inet_ntop(AF_INET, &(_client.sin_addr), _host, NI_MAXHOST);
-		std::cout << _host << " connected on " << ntohs(_client.sin_port) << std::endl;
-	}
-}
 
 void Server::_handleMultiplesConnection() {
 	int opt = 1;
@@ -185,17 +171,14 @@ void Server::_acceptIncomingConnection() {
 		{
 			throw acceptSocketError();
 		}
-		printf("New connection, socket fd is %d, ip is : %s, port : %d \n", new_socket, inet_ntoa(_hint.sin_addr), ntohs(_hint.sin_port));
 		client_socket.push_back(new_socket);
 		User tmp(new_socket);
 		users.push_back(tmp);
-		std::cout << "Adding to list of sockets as " << client_socket.size() -1 << std::endl << std::endl;
 	}
 }
 
 void Server::_handleDisconnection(int i, int sd) {
 	getpeername(sd, (struct sockaddr*)&_hint, (socklen_t*)&_hintlen);
-	printf("Host disconnected, ip %s, port %d \n", inet_ntoa(_hint.sin_addr), ntohs(_hint.sin_port));   
 	//Close the socket and mark as 0 in list for reuse  
 	close(sd);
 	client_socket.erase(client_socket.begin() + i);

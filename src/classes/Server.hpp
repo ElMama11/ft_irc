@@ -23,7 +23,6 @@ class Executor;
 class Server {
 
 	private:
-		void	_logConnection();
 		void	_handleMultiplesConnection();
 		void	_acceptIncomingConnection();
 		void	_handleDisconnection(int i, int sd);
@@ -117,7 +116,7 @@ class Server {
 			public:
 				virtual const char *what() const throw()
 				{
-					return ("\nProgram terminated");
+					return ("\rProgram terminated");
 				}
 		};
 };
