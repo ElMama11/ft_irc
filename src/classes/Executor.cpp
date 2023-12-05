@@ -70,6 +70,8 @@ void Executor::_cap(std::string content) {
 
 void Executor::_nick(std::string content) {
 	std::string msg;
+	if (_userPtr->passwordWasChecked == true && _userPtr->checkPassword == false)
+		return ;
 	if (_userPtr->checkPassword == false) {
 		_pass("");
 		return;
@@ -134,6 +136,9 @@ void Executor::_user(std::string content) {
 	std::istringstream iss(content);
 	std::string tmp, msg;
 	std::vector<std::string> params;
+
+	if (_userPtr->passwordWasChecked == true && _userPtr->checkPassword == false)
+		return ;
 	if (_userPtr->checkPassword == false) {
 		_pass("");
 		return;
@@ -263,6 +268,7 @@ void Executor::_pass(std::string content) {
 	else {
 		std::string msg = ERR_PASSWDMISMATCH(_userPtr);
 		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		_userPtr->passwordWasChecked = true;
 		_server->errorMsg("Closing Link: localhost (Bad or empty Password)\n<connection gets terminated by the server>\n", _userPtr->getSocket());
 	}
 }

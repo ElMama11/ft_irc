@@ -6,6 +6,7 @@ User::User() {
 User::User(int socket) : _socket(socket) {
 	memset(this->buffer, 0, 4096);
 	checkPassword = false;
+	passwordWasChecked = false;
 	_nickname = "";
 	_username = "";
 	_realname = "";
