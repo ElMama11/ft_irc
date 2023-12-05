@@ -28,6 +28,7 @@ class User {
 
 		char buffer[4096];
 		bool checkPassword;
+		bool passwordWasChecked;
 		std::vector<std::string> invitationList;
 
 		/* FUNC */

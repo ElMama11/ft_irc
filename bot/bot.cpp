@@ -90,7 +90,7 @@ void	play(int socket, std::string channel)
 	std::string nl = "PRIVMSG " + channel + " :\n";
 	
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		for (int i = 0; i < nlNb; i++)
 			send(socket, nl.c_str(), nl.size(), 0);
@@ -241,6 +241,10 @@ void	bot(int socket, char **av)
 	{
 		memset(buff, 0, 4096);
 		if (recv(socket, buff, 4096, 0) == 0) {
+			msg = "QUIT\n";
+			send(socket, msg.c_str(), msg.size(), 0);
+			close(socket);
+			freeaddrinfo(res);
 			return ;
 		}
 			
