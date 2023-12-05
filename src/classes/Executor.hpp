@@ -28,7 +28,6 @@ class Executor {
 		void _cap(std::string content);
 		void _nick(std::string content);
 		void _user(std::string content);
-		void _quit(std::string content);
 		void _join(std::string content);
 		void _pass(std::string content);
 		void _mode(std::string content);
@@ -55,6 +54,7 @@ class Executor {
 		void execOPs(void);
 		Channel	*getChannelByName(std::string channelName);
 
+		void _quit(std::string content);
 		bool isChannel(std::string channel);
 		bool isUser(User *user);
 		bool isHash(std::string content);

@@ -106,11 +106,13 @@ void Server::handle() {
 				//Check if it was for closing , and also read the incoming message  
 				if ((valread = recv(client_socket[i] , tmpBuff, 4096, 0)) == 0) {
 					_handleDisconnection(i, client_socket[i]);
+					memset(tmpBuff, 0, 4096);
 				}
 				else {
 					for (j = 0; _executor->getUserPtr()->buffer[j] != '\0'; j++);
 					strcpy(_executor->getUserPtr()->buffer + j, tmpBuff);
 					if (_executor->getUserPtr()->findNl(_executor->getUserPtr()->buffer)) {
+						std::cout << tmpBuff << std::flush;
 						_executor->parseBuffer(_executor->getUserPtr()->buffer);
 						memset(_executor->getUserPtr()->buffer, 0, 4096);
 						_executor->execOPs();
@@ -179,9 +181,13 @@ void Server::_acceptIncomingConnection() {
 
 void Server::_handleDisconnection(int i, int sd) {
 	getpeername(sd, (struct sockaddr*)&_hint, (socklen_t*)&_hintlen);
+	_executor->_quit("");
+	getUserBySocket(sd)->checkPassword = false;
+	printf("Host disconnected, ip %s, port %d \n", inet_ntoa(_hint.sin_addr), ntohs(_hint.sin_port)); 
 	//Close the socket and mark as 0 in list for reuse  
 	close(sd);
 	client_socket.erase(client_socket.begin() + i);
+	_executor->setUserPtr(NULL);
 	for (std::list<User>::iterator it = users.begin(); it != users.end(); it++)
 		if ((*it).getSocket() == sd) {
 			users.erase(it);
