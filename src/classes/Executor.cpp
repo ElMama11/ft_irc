@@ -70,8 +70,7 @@ void Executor::_cap(std::string content) {
 
 void Executor::_nick(std::string content) {
 	std::string msg;
-	if (_userPtr->passwordWasChecked == true && _userPtr->checkPassword == false)
-		return ;
+
 	if (_userPtr->checkPassword == false) {
 		_pass("");
 		return;
@@ -103,6 +102,7 @@ void Executor::_nick(std::string content) {
 
 void Executor::_quit(std::string content) {
 	(void)(content);
+	memset(_userPtr->buffer, 0, 4096);
 	std::string msg = ":";
 	msg += _userPtr->getNickname();
 	msg += " QUIT :Connection closed\n";
@@ -137,15 +137,12 @@ void Executor::_user(std::string content) {
 	std::string tmp, msg;
 	std::vector<std::string> params;
 
-	if (_userPtr->passwordWasChecked == true && _userPtr->checkPassword == false)
-		return ;
 	if (_userPtr->checkPassword == false) {
 		_pass("");
 		return;
 	}
 	if (_userPtr->getNickname().empty()) {
-		msg = "ERROR: Nickname empty\n";
-		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		_server->errorMsg("Closing Link: localhost (Empty Nickname)\n<connection gets terminated by the server>\n", _userPtr->getSocket());
 		return ;
 	}
 	if (!(_userPtr->getUsername().empty())) {
