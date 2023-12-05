@@ -106,8 +106,9 @@ void Server::handle() {
 			_executor->setUserPtr(getUserBySocket(client_socket[i]));
 			if (FD_ISSET(client_socket[i] , &_readfds)) {
 				//Check if it was for closing , and also read the incoming message  
-				if ((valread = recv(client_socket[i] , tmpBuff, 4096, 0)) == 0)
+				if ((valread = recv(client_socket[i] , tmpBuff, 4096, 0)) == 0) {
 					_handleDisconnection(i, client_socket[i]);
+				}
 				else {
 					for (j = 0; _executor->getUserPtr()->buffer[j] != '\0'; j++);
 					strcpy(_executor->getUserPtr()->buffer + j, tmpBuff);
