@@ -29,6 +29,7 @@
 /* 443 */ #define ERR_USERONCHANNEL(targetName, channelName) ":" SERV_NAME " 443 " + targetName + " " + channelName + " :is already on channel" + "\n"
 /* 451 */ #define ERR_NOTREGISTERED(client) ":" SERV_NAME " 451 " + client + " :You have not registered" + "\n"
 /* 461 */ #define ERR_NEEDMOREPARAMS(client, command) ":" SERV_NAME " 461 " + client->getNickname() + " " + command + " :Not enough parameters" + "\n"
+/* 462 */ #define ERR_ALREADYREGISTERED(client) client + " :You may not reregister" + "\n"
 /* 463 	*/ #define ERR_ALREADYREGISTRED(clientName) ":" SERV_NAME " 463 " + clientName + " :Already registered" + "\n"
 /* 464 */ #define ERR_PASSWDMISMATCH(client) ":" SERV_NAME " 464 " + client->getNickname() + " :Password Incorrect" + "\n"
 /* 471 */ #define ERR_CHANNELISFULL(client, channelName) ":" SERV_NAME " 471 " + client->getNickname() + " " + channelName + " :Cannot join channel (+l) - channel is full, try again later" + "\n"

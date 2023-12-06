@@ -272,8 +272,10 @@ std::string	Channel::getNicknameWithPrefix(User *user)
 bool		Channel::isUserByNickname(std::string nickname)
 {
 	for (std::vector<User *>::iterator it = _user.begin(); it != _user.end(); it++)
+	{
 		if (nickname == (*it)->getNickname())
 			return (true);
+	}
 	return (false);
 }
 

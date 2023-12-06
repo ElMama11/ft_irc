@@ -12,7 +12,6 @@
 # include <sys/time.h>
 # include <stdio.h>
 # include <stdlib.h>
-# include <errno.h>
 # include <map>
 # include <list>
 # include <vector>
