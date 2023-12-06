@@ -232,7 +232,7 @@ void Executor::_join(std::string content) {
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
 			return;
 		}
-		else if (chanToJoin->isUserByNickname(_userPtr->getNickname()))
+		else if (chanToJoin->isUserAndOpByNickname(_userPtr->getNickname()))
 		{
 			msg = ERR_ALREADYREGISTERED(_userPtr->getNickname());
 			send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
