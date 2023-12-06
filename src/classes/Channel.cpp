@@ -336,13 +336,15 @@ void Channel::sendTopicReplyToAll(std::string chanName, std::string topic, Chann
 		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }
-void Channel::sendQuitReplyToAll(std::string msg) {
+void Channel::sendQuitReplyToAll(std::string msg, int socketSender) {
 
 	for (std::vector<User *>::iterator it = _op.begin(); it != _op.end(); it++) {
-		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
+		if ((*it)->getSocket() != socketSender)
+			send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 	for (std::vector<User *>::iterator it = _user.begin(); it != _user.end(); it++) {
-		send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
+		if ((*it)->getSocket() != socketSender)
+			send((*it)->getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }
 

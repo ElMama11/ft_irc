@@ -51,7 +51,7 @@ class	Channel
 		std::string		getAllUsersForNameReply();
 		void			sendKickReplyToAll(std::string chanName, std::string reason, std::string nickToKick, Channel *chan);
 		void			sendTopicReplyToAll(std::string chanName, std::string topic, Channel *chan);
-		void			sendQuitReplyToAll(std::string msg);
+		void			sendQuitReplyToAll(std::string msg, int socketSender);
 		void			sendModeReplyToAll(std::string msg);
 		void			sendPlayReplyToAll(Channel *chan, std::string msg, User *sender);
 		void			sendPrivmsgReplyToChan(Channel *chan, std::string reply, int socketSender);
