@@ -591,6 +591,16 @@ void Executor::_topic(std::string content) {
 void Executor::_invite(std::string content) {
 	std::string msg, nickToInvite, chanName;
 	Channel *chanToInvite;
+	int i = -1, j = 0;
+
+	while (content[++i])
+		if (content[i] == ' ')
+			j++;
+	if (j == 0) {
+		msg = ERR_NEEDMOREPARAMS(_userPtr, "INVITE");
+		send(_userPtr->getSocket(), msg.c_str(), msg.size(), 0);
+		return;
+	}
 	nickToInvite = strtok(const_cast<char *>(content.c_str()), " ");
 	chanName = strtok(0, " ");
 	chanToInvite = getChannelByName(chanName);
