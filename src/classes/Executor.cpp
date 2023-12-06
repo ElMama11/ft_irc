@@ -108,11 +108,11 @@ void Executor::_quit(std::string content) {
 	msg += " QUIT :Connection closed\n";
     for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); it++) {
 		if ((*it).isUserByNickname(_userPtr->getNickname()) == true) {
-			(*it).sendQuitReplyToAll(msg);
+			(*it).sendQuitReplyToAll(msg, _userPtr->getSocket());
 			(*it).delUser(_userPtr);
 		}
 		else if ((*it).isOpByNickname(_userPtr->getNickname()) == true) {
-			(*it).sendQuitReplyToAll(msg);
+			(*it).sendQuitReplyToAll(msg, _userPtr->getSocket());
 			(*it).delUser(_userPtr);
 		}
 	}
