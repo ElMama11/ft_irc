@@ -18,6 +18,7 @@ Executor::Executor(Server *ptr) {
 	this->_mapping["KICK"] = &Executor::_kick;
 	this->_mapping["TOPIC"] = &Executor::_topic;
 	this->_mapping["INVITE"] = &Executor::_invite;
+	this->_mapping[""] = &Executor::_cap;
 	return ;
 }
 
